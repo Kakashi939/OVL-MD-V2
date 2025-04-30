@@ -1,15 +1,15 @@
 {
-  "name": "OVL-MD",
-  "version": "1.0.0",
+  "name": "OVL-MD-V2",
+  "version": "2.0.0",
   "description": "Bot WhatsApp développé par Ainz",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node Ovl.js",
     "stop": "pm2 stop all",
-    "Ovl": "pm2 start index.js --attach --name ovl"
+    "Ovl": "pm2 start Ovl.js --attach --name ovl"
     },
-  "keywords": ["Ainz", "Ovl-Md", "Baileys"],
-  "author": "Ainz",
+  "keywords": ["Ainz-devs", "OVL-MD-V2", "Wa-bot", "baileys" ],
+  "author": "Ainz-devs",
   "license": "MIT",
   "dependencies": {
     "@distube/ytsr": "^2.0.4",
