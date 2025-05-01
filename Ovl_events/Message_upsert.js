@@ -102,391 +102,44 @@ const verif_Admin = verif_Groupe
     };
  
 //Rank messages && Level up
- if (texte && auteur_Message.endsWith("s.whatsapp.net")) {
-    let userId = auteur_Message;
-    const user = await Ranks.findOne({ where: { id: userId } });
-    if (!user) {
-        await Ranks.create({
-            id: userId,
-            name: nom_Auteur_Message,
-            level: 0,
-            exp: 10,
-            messages: 1,
-        });
-    } else {
-        user.name = nom_Auteur_Message;
-        user.messages += 1;
-        user.exp += 10;
 
-        const newLevel = calculateLevel(user.exp);
-
-        if (newLevel > user.level && config.LEVEL_UP == 'oui') {
-            await ovl.sendMessage(ms_org, {
-                text: `Félicitations ${nom_Auteur_Message}! Vous avez atteint le niveau ${newLevel}! 🎉`
-            });
-        }
-
-        user.level = newLevel;
-        await user.save();
-    }
- };
  // Fin Rank et Level up
  
  const settings = await WA_CONF.findOne({ where: { id: '1' } });
         if (settings) {
 // Présence
-if (settings.presence === 'enligne') {
-    await ovl.sendPresenceUpdate("available", ms_org);
-} else if (settings.presence === 'ecrit') {
-    await ovl.sendPresenceUpdate("composing", ms_org);
-} else if (settings.presence === 'enregistre') {
-    await ovl.sendPresenceUpdate("recording", ms_org);
-}
+
 
 // Auto read status
-if (ms_org === "status@broadcast" && settings.lecture_status === "oui") { 
-    await ovl.readMessages([ms.key]);
-}
+
 
 // Like status
-if (ms_org === "status@broadcast" && settings.like_status === "oui") {
-    await ovl.sendMessage(ms_org, { react: { key: ms.key, text: "💚" } }, { statusJidList: [ms.key.participant, id_Bot], broadcast: true });
-}
+
 
 // DL_STATUS
-if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
-    if (ms.message.extendedTextMessage) {
-        await ovl.sendMessage(id_Bot, { text: ms.message.extendedTextMessage.text }, { quoted: ms });
-    } else if (ms.message.imageMessage) {
-        let imgs = await ovl.dl_save_media_ms(ms.message.imageMessage);
-        await ovl.sendMessage(id_Bot, { image: { url: imgs }, caption: ms.message.imageMessage.caption }, { quoted: ms });
-    } else if (ms.message.videoMessage) {
-        let vids = await ovl.dl_save_media_ms(ms.message.videoMessage);
-        await ovl.sendMessage(id_Bot, { video: { url: vids }, caption: ms.message.videoMessage.caption }, { quoted: ms });
-    }
-}
+
 
 // Anti Vue Unique
-if (settings.antivv === "oui") {
-    let viewOnceKey = Object.keys(ms.message).find(key => key.startsWith("viewOnceMessage"));
-    let vue_Unique_Message = ms.message;
 
-    if (viewOnceKey) {
-        vue_Unique_Message = ms.message[viewOnceKey].message;
-    }
-
-    if (vue_Unique_Message) {
-        if (
-            (vue_Unique_Message.imageMessage && vue_Unique_Message.imageMessage.viewOnce == true) ||
-            (vue_Unique_Message.videoMessage && vue_Unique_Message.videoMessage.viewOnce == true) ||
-            (vue_Unique_Message.audioMessage && vue_Unique_Message.audioMessage.viewOnce == true)
-        ) {
-        
-    try {
-        let media;
-        let options = { quoted: ms };
-
-        if (vue_Unique_Message.imageMessage) {
-            media = await ovl.dl_save_media_ms(vue_Unique_Message.imageMessage);
-            await ovl.sendMessage(
-                ovl.user.id,
-                { image: { url: media }, caption: vue_Unique_Message.imageMessage.caption || "" },
-                options
-            );
-
-        } else if (vue_Unique_Message.videoMessage) {
-            media = await ovl.dl_save_media_ms(vue_Unique_Message.videoMessage);
-            await ovl.sendMessage(
-                ovl.user.id,
-                { video: { url: media }, caption: vue_Unique_Message.videoMessage.caption || "" },
-                options
-            );
-
-        } else if (vue_Unique_Message.audioMessage) {
-            media = await ovl.dl_save_media_ms(vue_Unique_Message.audioMessage);
-            await ovl.sendMessage(
-                ovl.user.id,
-                { audio: { url: media }, mimetype: "audio/mp4", ptt: false },
-                options
-            );
-
-        }
-    } catch (_error) {
-        console.error("❌ Erreur lors du traitement du message en vue unique :", _error.message || _error);
-    }
-}
-     }
-    }
 
 
    //antidelete
- try {
-    if (mtype === 'protocolMessage' && ['pm', 'gc', 'status', 'all', 'pm/gc', 'pm/status', 'gc/status'].includes(settings.antidelete)) {
-        const deletedMsgKey = ms.message.protocolMessage;
-        const deletedMsg = getMessage(deletedMsgKey.key.id);
 
-        if (deletedMsg) {
-            const jid = deletedMsg.key.remoteJid;
-            const vg = jid?.endsWith("@g.us");
-            const sender = vg 
-                ? (deletedMsg.key.participant || deletedMsg.participant)
-                : jid;
-            const deletionTime = new Date().toISOString().substr(11, 8);
-
-            if (!deletedMsg.key.fromMe) {
-                const provenance = jid.endsWith('@g.us') 
-                    ? `👥 Groupe : ${(await ovl.groupMetadata(jid)).subject}`
-                    : `📩 Chat : @${jid.split('@')[0]}`;
-
-                const header = `
-✨ OVL-MD ANTI-DELETE MSG✨
-👤 Envoyé par : @${sender.split('@')[0]}
-❌ Supprimé par : @${auteur_Message.split('@')[0]}
-⏰ Heure de suppression : ${deletionTime}
-${provenance}
-                `;
-
-                const shouldSend = (
-                    (settings.antidelete === 'gc' && jid.endsWith('@g.us')) ||
-                    (settings.antidelete === 'pm' && jid.endsWith('@s.whatsapp.net')) ||
-                    (settings.antidelete === 'status' && jid.endsWith('status@broadcast')) ||
-                    (settings.antidelete === 'all') ||
-                    (settings.antidelete === 'pm/gc' && (jid.endsWith('@g.us') || jid.endsWith('@s.whatsapp.net'))) ||
-                    (settings.antidelete === 'pm/status' && (jid.endsWith('status@broadcast') || jid.endsWith('@s.whatsapp.net'))) ||
-                    (settings.antidelete === 'gc/status' && (jid.endsWith('@g.us') || jid.endsWith('status@broadcast')))
-                );
-
-                if (shouldSend) {
-                    await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
-                    await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                }
-            }
-        }
-    }
-} catch (err) {
-    console.error('Une erreur est survenue', err);
-}
-        }
  //fin antidelete
  
 //Antitag 
- if (ms.message?.[mtype]?.contextInfo?.mentionedJid?.length > 30) {
 
-    try {
-        const settings = await Antitag.findOne({ where: { id: ms_org } });
-
-        if (verif_Groupe && settings && settings.mode === 'oui') {
-            if (!verif_Admin && verif_Ovl_Admin) {
-                const username = auteur_Message.split("@")[0];
-
-                switch (settings.type) {
-                    case 'supp':
-                        await ovl.sendMessage(ms_org, {
-                            text: `@${username}, l'envoi de tags multiples est interdit dans ce groupe.`,
-                            mentions: [auteur_Message]
-                        }, { quoted: ms });
-                        await ovl.sendMessage(ms_org, { delete: ms.key });
-                        break;
-
-                    case 'kick':
-                        await ovl.sendMessage(ms_org, {
-                            text: `@${username} a été retiré du groupe pour avoir mentionné plus de 30 membres.`,
-                            mentions: [auteur_Message]
-                        });
-                        await ovl.sendMessage(ms_org, { delete: ms.key });
-                        await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
-                        break;
-
-                    case 'warn':
-                        let warning = await Antitag_warnings.findOne({
-                            where: { groupId: ms_org, userId: auteur_Message }
-                        });
-
-                        if (!warning) {
-                            await Antitag_warnings.create({ groupId: ms_org, userId: auteur_Message });
-                            await ovl.sendMessage(ms_org, {
-                                text: `@${username}, vous avez reçu un avertissement (1/3) pour avoir mentionné plus de 30 membres.`,
-                                mentions: [auteur_Message]
-                            });
-                        } else {
-                            warning.count += 1;
-                            await warning.save();
-
-                            if (warning.count >= 3) {
-                                await ovl.sendMessage(ms_org, {
-                                    text: `@${username} a été retiré du groupe après 3 avertissements.`,
-                                    mentions: [auteur_Message]
-                                });
-                                await ovl.sendMessage(ms_org, { delete: ms.key });
-                                await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
-                                await warning.destroy();
-                            } else {
-                                await ovl.sendMessage(ms_org, {
-                                    text: `@${username}, avertissement ${warning.count}/3 pour avoir mentionné plus de 30 membres.`,
-                                    mentions: [auteur_Message]
-                                });
-                            }
-                        }
-                        break;
-
-                    default:
-                        console.error(`Action inconnue : ${settings.type}`);
-                }
-            }
-        }
-    } catch (error) {
-        console.error("Erreur dans le système Antitag :", error);
-    }
-}
 //Fin antitag
  
           //antilink
          // const linkRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+\.[^\s]+)/gi;
 
-try {
-    if ((texte.includes('https://') || texte.includes('http://'))) {
-   // if (linkRegex.test(texte)) {
-     const settings = await Antilink.findOne({ where: { id: ms_org } });
-        if (verif_Groupe && settings && settings.mode == 'oui') {
-        if (!verif_Admin && verif_Ovl_Admin) {
-          switch (settings.type) {
-            case 'supp':
-                await ovl.sendMessage(ms_org, {
-                    text: `@${auteur_Message.split("@")[0]}, les liens ne sont pas autorisés ici.`,
-                    mentions: [auteur_Message]
-                });
-                await ovl.sendMessage(ms_org, { delete: ms.key });
-                break;
 
-            case 'kick':
-                await ovl.sendMessage(ms_org, {
-                    text: `@${auteur_Message.split("@")[0]} a été retiré pour avoir envoyé un lien.`,
-                    mentions: [auteur_Message]
-                });
-                await ovl.sendMessage(ms_org, { delete: ms.key });
-                await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
-                break;
-
-            case 'warn':
-                let warning = await Antilink_warnings.findOne({
-                    where: { groupId: ms_org, userId: auteur_Message }
-                });
-
-                if (!warning) {
-                    await Antilink_warnings.create({ groupId: ms_org, userId: auteur_Message });
-                    await ovl.sendMessage(ms_org, {
-                        text: `@${auteur_Message.split("@")[0]}, avertissement 1/3 pour avoir envoyé un lien.`,
-                        mentions: [auteur_Message]
-                    });
-                } else {
-                    warning.count += 1;
-                    await warning.save();
-
-                    if (warning.count >= 3) {
-                        await ovl.sendMessage(ms_org, {
-                            text: `@${auteur_Message.split("@")[0]} a été retiré après 3 avertissements.`,
-                            mentions: [auteur_Message]
-
-                        });
-                        await ovl.sendMessage(ms_org, { delete: ms.key });
-                        await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
-                        await warning.destroy();
-                    } else {
-                        await ovl.sendMessage(ms_org, {
-                            text: `@${auteur_Message.split("@")[0]}, avertissement ${warning.count}/3 pour avoir envoyé un lien.`,
-                            mentions: [auteur_Message]
-                        });
-                    }
-                }
-                break;
-
-            default:
-                console.error(`Action inconnue : ${settings.type}`);
-                }
-            }
-        }
-    }
-} catch (error) {
-    console.error("Erreur dans le système Antilink :", error);
-   }
 
           //fin antilink
 
  // Antibot
- try {
-    const botMsg = ms.key?.id?.startsWith('BAES') && ms.key?.id?.length === 16;
-    const baileysMsg = ms.key?.id?.startsWith('BAE5') && ms.key?.id?.length === 16;
 
-    if (botMsg || baileysMsg) {
-        const settings = await Antibot.findOne({ where: { id: ms_org } });
-        if (verif_Groupe && settings && settings.mode === 'oui') {
-            if (!verif_Admin && verif_Ovl_Admin) {
-                const key = {
-                    remoteJid: ms_org,
-                    fromMe: false,
-                    id: ms.key.id,
-                    participant: auteur_Message
-                };
-
-                switch (settings.type) {
-                    case 'supp':
-                        await ovl.sendMessage(ms_org, {
-                            text: `@${auteur_Message.split("@")[0]}, les bots ne sont pas autorisés ici.`,
-                            mentions: [auteur_Message]
-                        });
-                        await ovl.sendMessage(ms_org, { delete: ms.key });
-                        break;
-
-                    case 'kick':
-                        await ovl.sendMessage(ms_org, {
-                            text: `@${auteur_Message.split("@")[0]} a été retiré pour avoir utilisé un bot.`,
-                            mentions: [auteur_Message]
-                        });
-                        await ovl.sendMessage(ms_org, { delete: ms.key });
-                        await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
-                        break;
-
-                    case 'warn':
-                        let warning = await Antibot_warnings.findOne({
-                            where: { groupId: ms_org, userId: auteur_Message }
-                        });
-
-                        if (!warning) {
-                            await Antibot_warnings.create({ groupId: ms_org, userId: auteur_Message });
-                            await ovl.sendMessage(ms_org, {
-                                text: `@${auteur_Message.split("@")[0]}, avertissement 1/3 pour utilisation de bot.`,
-                                mentions: [auteur_Message]
-                            });
-                        } else {
-                            warning.count += 1;
-                            await warning.save();
-
-                            if (warning.count >= 3) {
-                                await ovl.sendMessage(ms_org, {
-                                    text: `@${auteur_Message.split("@")[0]} a été retiré après 3 avertissements.`,
-                                    mentions: [auteur_Message]
-                                });
-                                await ovl.sendMessage(ms_org, { delete: ms.key });
-                                await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
-                                await warning.destroy();
-                            } else {
-                                await ovl.sendMessage(ms_org, {
-                                    text: `@${auteur_Message.split("@")[0]}, avertissement ${warning.count}/3 pour utilisation de bot.`,
-                                    mentions: [auteur_Message]
-                                });
-                            }
-                        }
-                        break;
-
-                    default:
-                        console.error(`Action inconnue : ${settings.type}`);
-                }
-            }
-        }
-    }
-} catch (error) {
-    console.error("Erreur dans le système Anti-Bot :", error);
-}
 // fin antibot
 
  // quelque fonctions 
