@@ -1,4 +1,4 @@
-const { Antilink, Antilink_warnings } = require("../../../DataBase/antilink");
+const { Antilink, Antilink_warnings } = require("../../DataBase/antilink");
 
 function containsLink(text) {
     const linkRegex = /(?:https?:\/\/|www\.|[a-z0-9-]+\.[a-z]{2,})(\/\S*)?/i;
