@@ -1,24 +1,11 @@
 const fs = require('fs');
 const pino = require("pino");
-const path = require('path');
 const axios = require('axios');
 const { exec } = require("child_process");
 const { default: makeWASocket, useMultiFileAuthState, logger, delay, makeCacheableSignalKeyStore, jidDecode, getContentType, downloadContentFromMessage, makeInMemoryStore, fetchLatestBaileysVersion, DisconnectReason } = require("ovl_wa_baileys");
 const config = require("./set");
 const session = config.SESSION_ID || "";
-let evt = require(__dirname + "/lib/ovlcmd");
 const FileType = require('file-type')
-const prefixe = config.PREFIXE;
-const { Antilink, Antilink_warnings } = require("./DataBase/antilink");
-const { Antitag, Antitag_warnings } = require("./DataBase/antitag");
-const { Antibot, AntibotWarnings } = require("./DataBase/antibot");
-const { Bans } = require("./DataBase/ban");
-const { GroupSettings } = require("./DataBase/events");
-const { levels, calculateLevel } = require('./DataBase/levels');
-const { Ranks } = require('./DataBase/rank');
-const { Sudo } = require('./DataBase/sudo');
-const { getMessage, addMessage } = require('./lib/store');
-const { WA_CONF } = require('./DataBase/wa_conf');
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
@@ -42,7 +29,7 @@ ovlAuth(session);
 
 async function main() {
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, 'auth'));
+    const { state, saveCreds } = await useMultiFileAuthState('./auth'));
         try {
         const store = makeInMemoryStore({ logger: pino().child({ level: "silent", stream: "store"
   })
@@ -90,17 +77,6 @@ store.bind(ovl.ev);
 }
 
 main();
-
-
-
-
-
-
-
-
-
-
-
 
 
 
