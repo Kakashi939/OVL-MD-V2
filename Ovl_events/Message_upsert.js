@@ -1,6 +1,5 @@
 const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot } = require('./Message_upsert_events');
 const { Bans } = require("../DataBase/ban");
-const { GroupSettings } = require("../DataBase/events");
 const { Sudo } = require('../DataBase/sudo');
 const { getMessage, addMessage } = require('../lib/store');
 const { jidDecode, getContentType } = require("ovl_wa_baileys");
