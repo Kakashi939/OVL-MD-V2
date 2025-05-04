@@ -1,5 +1,5 @@
 module.exports = {
-  rankAndLevelUp: require('./rankAndLevelUp'),
+  rankAndLevelUp: require('./rank&levelup'),
   lecture_status: require('./lecture_status'),
   like_status: require('./like_status'),
   presence: require('./presence'),
