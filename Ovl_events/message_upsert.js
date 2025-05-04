@@ -7,7 +7,7 @@ let evt = require("../lib/ovlcmd");
 const config = require("../set");
 const prefixe = config.PREFIXE;
 
-async function message_upsert(m, ovl) => {
+async function message_upsert(m, ovl) {
     if (m.type !== 'notify') return;
 
     const ms = m.messages?.[0];
