@@ -1,6 +1,6 @@
-const { Antitag, Antitag_warnings } = require("./DataBase/antitag");
+const { Antitag, Antitag_warnings } = require(".../DataBase/antitag");
 
-module.exports = async function antitag(ovl, ms, ms_org, mtype, verif_Groupe, verif_Ovl_Admin, verif_Admin, auteur_Message) {
+async function antitag(ovl, ms, ms_org, mtype, verif_Groupe, verif_Ovl_Admin, verif_Admin, auteur_Message) {
     if (ms.message?.[mtype]?.contextInfo?.mentionedJid?.length > 30) {
         try {
             const settings = await Antitag.findOne({ where: { id: ms_org } });
@@ -83,3 +83,5 @@ module.exports = async function antitag(ovl, ms, ms_org, mtype, verif_Groupe, ve
         }
     }
 }
+
+module.exports = { antitag };
