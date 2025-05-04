@@ -1,4 +1,4 @@
-const { WA_CONF } = require('../../../DataBase/wa_conf');
+const { WA_CONF } = require('../../DataBase/wa_conf');
 
 async function dl_status(ovl, ms_org, ms) {
     const settings = await WA_CONF.findOne({ where: { id: '1' } });
