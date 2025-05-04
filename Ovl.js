@@ -1,85 +1,87 @@
 const fs = require('fs');
+const path = require('path');
 const pino = require("pino");
 const axios = require('axios');
-const { exec } = require("child_process");
-const { default: makeWASocket, useMultiFileAuthState, logger, delay, makeCacheableSignalKeyStore, jidDecode, getContentType, downloadContentFromMessage, makeInMemoryStore, fetchLatestBaileysVersion, DisconnectReason } = require("ovl_wa_baileys");
+const express = require('express');
+const {
+    default: makeWASocket,
+    useMultiFileAuthState,
+    logger,
+    makeCacheableSignalKeyStore,
+    makeInMemoryStore,
+    fetchLatestBaileysVersion,
+    Browsers,
+    downloadContentFromMessage,
+    DisconnectReason
+} = require("ovl_wa_baileys");
+
 const config = require("./set");
 const session = config.SESSION_ID || "";
-const FileType = require('file-type')
-const express = require('express');
+const { message_upsert, group_participants_update, connection_update, dl_save_media_ms, recup_msg } = require('./Ovl_events');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-
 async function ovlAuth(session) {
-    let sessionId;
     try {
         if (session.startsWith("Ovl-MD_") && session.endsWith("_SESSION-ID")) {
-            sessionId = session.slice(7, -11);
+            const sessionId = session.slice(7, -11);
+            const response = await axios.get('https://pastebin.com/raw/' + sessionId);
+            const data = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+            const filePath = path.join(__dirname, 'auth', 'creds.json');
+            fs.writeFileSync(filePath, data, 'utf8');
         }
-        const response = await axios.get('https://pastebin.com/raw/' + sessionId);
-        const data = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-        const filePath = path.join(__dirname, 'auth', 'creds.json');
-            await fs.writeFileSync(filePath, data, 'utf8');
     } catch (e) {
-        console.log("Session invalide: " + e.message || e);
+        console.log("Session invalide: " + (e.message || e));
     }
- }
+}
 ovlAuth(session);
 
 async function main() {
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('./auth'));
-        try {
-        const store = makeInMemoryStore({ logger: pino().child({ level: "silent", stream: "store"
-  })
-});
-         const ovl = makeWASocket({
+    const { state, saveCreds } = await useMultiFileAuthState('./auth');
+
+    try {
+        const store = makeInMemoryStore({ logger: pino().child({ level: "silent", stream: "store" }) });
+
+        const ovl = makeWASocket({
             printQRInTerminal: true,
             logger: pino({ level: "silent" }),
-            browser: [ "Ubuntu", "Chrome", "20.0.04" ],
+            browser: Browsers.macOS("Safari"),
             generateHighQualityLinkPreview: true,
             syncFullHistory: false,
             auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }).child({ level: "silent" }))
-        },
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }))
+            },
             getMessage: async (key) => {
-                    const msg = await store.loadMessage(key.remoteJid, key.id);
-                    return msg.message;
-           }
+                const msg = await store.loadMessage(key.remoteJid, key.id);
+                return msg?.message;
+            }
         });
-store.bind(ovl.ev);
-         //fin événement message 
 
-         //group participants update
+        store.bind(ovl.ev);
 
-
-         //Fin group participants update
-
-         // Antidelete
-
-
-// FIN ANTIDELETE        
-         
-
-
-        // Gestion des mises à jour des identifiants
+        // Liaison des événements
+        ovl.ev.on("messages.upsert", async (m) => { message_upsert(m, ovl); });
+        ovl.ev.on('group-participants.update', async (data) => { group_participants_update(data, ovl); });
+        ovl.ev.on("connection.update", async (con) => { connection_update(con, ovl, main); });
         ovl.ev.on("creds.update", saveCreds);
 
-            //autre fonction de ovl
-            
+        // Ajout des fonctions au bot
+        ovl.dl_save_media_ms = (msg, filename = '', attachExt = true, dir = './downloads') =>
+            dl_save_media_ms(ovl, msg, filename, attachExt, dir);
 
-            //fin autre fonction ovl
+        ovl.recup_msg = (params = {}) =>
+            recup_msg({ ovl, ...params });
+
     } catch (error) {
         console.error("Erreur principale:", error);
     }
 }
-
 main();
 
-
-
+// Serveur Express
 let dernierPingRecu = Date.now();
 
 app.get('/', (req, res) => {
@@ -91,39 +93,11 @@ app.get('/', (req, res) => {
     <title>OVL-Bot Web Page</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #121212;
-            font-family: Arial, sans-serif;
-            color: #ffffff;
-            overflow: hidden;
-        }
-        .content {
-            text-align: center;
-            padding: 30px;
-            background-color: #1e1e1e;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .content:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.15);
-        }
-        h1 {
-            font-size: 2em;
-            color: #f0f0f0;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-        p {
-            font-size: 1.1em;
-            color: #d3d3d3;
-            line-height: 1.5;
-        }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #121212; font-family: Arial, sans-serif; color: #ffffff; overflow: hidden; }
+        .content { text-align: center; padding: 30px; background-color: #1e1e1e; border-radius: 12px; box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .content:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(255, 255, 255, 0.15); }
+        h1 { font-size: 2em; color: #f0f0f0; margin-bottom: 15px; letter-spacing: 1px; }
+        p { font-size: 1.1em; color: #d3d3d3; line-height: 1.5; }
     </style>
 </head>
 <body>
