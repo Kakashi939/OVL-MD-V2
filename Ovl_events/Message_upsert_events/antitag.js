@@ -84,4 +84,4 @@ async function antitag(ovl, ms, ms_org, mtype, verif_Groupe, verif_Ovl_Admin, ve
     }
 }
 
-module.exports = { antitag };
+module.exports = antitag;
