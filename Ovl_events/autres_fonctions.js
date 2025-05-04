@@ -1,11 +1,14 @@
-ovl.dl_save_media_ms = async (message, filename = '', attachExtension = true, directory = './downloads') => {
+const fs = require('fs');
+const path = require('path');
+const { downloadContentFromMessage } = require("ovl_wa_baileys");
+const FileType = require('file-type');
+
+async function dl_save_media_ms(ovl, message, filename = '', attachExtension = true, directory = './downloads') {
     try {
         const quoted = message.msg || message;
         const mime = quoted.mimetype || '';
         const messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0];
-        
-        console.log(`Téléchargement du message de type: ${messageType}`);
-        
+
         if (!mime) {
             throw new Error("Type MIME non spécifié ou non pris en charge.");
         }
@@ -15,32 +18,30 @@ ovl.dl_save_media_ms = async (message, filename = '', attachExtension = true, di
         for await (const chunk of stream) {
             bufferChunks.push(chunk);
         }
-        
+
         const buffer = Buffer.concat(bufferChunks);
         const type = await FileType.fromBuffer(buffer);
         if (!type) {
             throw new Error("Type de fichier non reconnu");
         }
 
-        // Création du chemin du répertoire
         if (!fs.existsSync(directory)) {
             fs.mkdirSync(directory, { recursive: true });
         }
-        
+
         const trueFileName = attachExtension ? `${filename}.${type.ext}` : filename;
         const filePath = path.resolve(directory, trueFileName);
 
-        // Écriture directe dans un fichier via un flux de création
         await fs.promises.writeFile(filePath, buffer);
-        console.log(`Fichier sauvegardé à: ${filePath}`);
-        
+
         return filePath;
     } catch (error) {
         console.error('Erreur lors du téléchargement et de la sauvegarde du fichier:', error);
         throw error;
     }
-};
-         ovl.recup_msg = async ({ expediteur, salon, limiteTemps = 0, condition = () => true } = {}) => {
+}
+
+async function recup_msg({ovl, expediteur, salon, limiteTemps = 0, condition = () => true } = {}) {
     return new Promise((accepter, refuser) => {
         if (typeof expediteur !== 'string' || !expediteur) return refuser(new Error("L'expéditeur doit être une chaîne non vide."));
         if (typeof salon !== 'string' || !salon) return refuser(new Error("Le salon doit être une chaîne non vide."));
@@ -77,4 +78,6 @@ ovl.dl_save_media_ms = async (message, filename = '', attachExtension = true, di
             }, limiteTemps);
         }
     });
-};
+}
+
+module.exports = { dl_save_media_ms, recup_msg };
