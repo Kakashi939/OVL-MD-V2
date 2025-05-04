@@ -1,4 +1,4 @@
-const { Antibot, AntibotWarnings } = require(".../DataBase/antibot");
+const { Antibot, AntibotWarnings } = require("../../../DataBase/antibot");
 
 async function antibot(ovl, ms_org, ms, verif_Groupe, verif_Admin, verif_Ovl_Admin, auteur_Message) {
     try {
