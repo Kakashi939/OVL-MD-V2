@@ -1,4 +1,4 @@
-const { WA_CONF } = require('../../../DataBase/wa_conf');
+const { WA_CONF } = require('../../DataBase/wa_conf');
 
 async function antivv (ovl, ms) {
   const settings = await WA_CONF.findOne({ where: { id: '1' } });
