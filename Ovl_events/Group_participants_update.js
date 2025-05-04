@@ -1,4 +1,7 @@
-module.exports = async group_participants_update (data) => {
+const { GroupSettings } = require("../DataBase/events");
+const { jidDecode } = require("ovl_wa_baileys");
+
+async group_participants_update (data, ovl) => {
     const parseID = (jid) => {
         if (!jid) return jid;
         if (/:\d+@/gi.test(jid)) {
@@ -11,16 +14,17 @@ module.exports = async group_participants_update (data) => {
     try {
         const groupInfo = await ovl.groupMetadata(data.id);
         const settings = await GroupSettings.findOne({ where: { id: data.id } });
+
         if (!settings) return;
 
         const { welcome, goodbye, antipromote, antidemote } = settings;
 
         for (const participant of data.participants) {
-         let profilePic;
+            let profilePic;
             try {
                 profilePic = await ovl.profilePictureUrl(participant, 'image');
             } catch (err) {
-             console.error(err);
+                console.error(err);
                 profilePic = 'https://files.catbox.moe/54ip7g.jpg';
             }
 
@@ -62,3 +66,5 @@ module.exports = async group_participants_update (data) => {
         console.error(err);
     }
 };
+
+module.exports = group_participants_update;
