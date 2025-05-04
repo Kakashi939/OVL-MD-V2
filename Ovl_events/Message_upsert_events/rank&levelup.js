@@ -1,5 +1,5 @@
-const { levels, calculateLevel } = require('../../../DataBase/levels');
-const { Ranks } = require('../../../DataBase/rank');
+const { levels, calculateLevel } = require('../../DataBase/levels');
+const { Ranks } = require('../../DataBase/rank');
 
 async function rankAndLevelUp(ovl, ms_org, texte, auteur_Message, nom_Auteur_Message, config) {
     if (texte && auteur_Message.endsWith("s.whatsapp.net")) {
