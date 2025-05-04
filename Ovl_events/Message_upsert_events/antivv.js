@@ -1,6 +1,6 @@
 const { WA_CONF } = require('.../DataBase/wa_conf');
 
-async function antivv (ovl, ms) => {
+async function antivv (ovl, ms) {
   const settings = await WA_CONF.findOne({ where: { id: '1' } });
   if (settings && settings.antivv === "oui") {
     let viewOnceKey = Object.keys(ms.message).find(key => key.startsWith("viewOnceMessage"));
