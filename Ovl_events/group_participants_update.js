@@ -1,7 +1,7 @@
 const { GroupSettings } = require("../DataBase/events");
 const { jidDecode } = require("ovl_wa_baileys");
 
-async function group_participants_update (data, ovl) => {
+async function group_participants_update (data, ovl) {
     const parseID = (jid) => {
         if (!jid) return jid;
         if (/:\d+@/gi.test(jid)) {
