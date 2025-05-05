@@ -13,7 +13,7 @@ async function connection_update(con, ovl, main) {
         console.log("✅ Connexion établie ; Le bot est en ligne 🌐\n\n");
         
         console.log("Chargement des commandes...\n");
-        const commandes = fs.readdirSync(path.join(__dirname, "cmd")).filter(fichier => path.extname(fichier).toLowerCase() === ".js");
+        const commandes = fs.readdirSync("../cmd").filter(fichier => path.extname(fichier).toLowerCase() === ".js");
         
         for (const fichier of commandes) {
             try {
