@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 const { delay, DisconnectReason } = require("ovl_wa_baileys");
 let evt = require("../lib/ovlcmd");
 const config = require("../set");
@@ -17,7 +16,7 @@ async function connection_update(con, ovl, main) {
         
         for (const fichier of commandes) {
             try {
-                require(path.join(__dirname, "commandes", fichier));
+                require(`../cmd/${fichier}`);
                 console.log(`${fichier} installé avec succès`);
                 await delay(300); // Pause de 300 ms
             } catch (e) {
