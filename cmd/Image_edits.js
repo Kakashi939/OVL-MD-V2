@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { ovlcmd } = require("../framework/ovlcmd");
+const { ovlcmd } = require("../lib/ovlcmd");
 const canvacord = require("canvacord");
 const axios = require("axios");
 
