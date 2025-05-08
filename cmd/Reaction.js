@@ -1,4 +1,4 @@
-const { ovlcmd } = require("../framework/ovlcmd");
+const { ovlcmd } = require("../lib/ovlcmd");
 const axios = require("axios");
 const fs = require("fs");
 const child_process = require("child_process");
