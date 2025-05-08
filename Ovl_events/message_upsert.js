@@ -5,7 +5,7 @@ const { getMessage, addMessage } = require('../lib/store');
 const { jidDecode, getContentType } = require("ovl_wa_baileys");
 let evt = require("../lib/ovlcmd");
 const config = require("../set");
-const prefixe = config.PREFIXE;
+const prefixe = config.PREFIXE || "";
 
 async function message_upsert(m, ovl) {
     if (m.type !== 'notify') return;
