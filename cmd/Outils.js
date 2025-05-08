@@ -19,7 +19,7 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-            const response = await axios.get('https://raw.githubusercontent.com/ton_utilisateur/ton_repo/main/themes.json');
+            const response = await axios.get('https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json');
             const themes = response.data;
 
             const selectedTheme = themes.find(t => t.id == config.THEME);
