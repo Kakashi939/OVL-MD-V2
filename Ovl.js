@@ -69,10 +69,10 @@ async function main() {
         ovl.ev.on("creds.update", saveCreds);
 
         // Ajout des fonctions au bot
-        ovl.dl_save_media_ms = (msg, filename = '', attachExt = true, dir = './downloads') =>
+        ovl.dl_save_media_ms = async (msg, filename = '', attachExt = true, dir = './downloads') =>
             dl_save_media_ms(ovl, msg, filename, attachExt, dir);
 
-        ovl.recup_msg = (params = {}) =>
+        ovl.recup_msg = async (params = {}) =>
             recup_msg({ ovl, ...params });
 
     } catch (error) {
