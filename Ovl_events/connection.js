@@ -32,7 +32,7 @@ async function connection_update(con, ovl, main) {
         await delay(700);
 
         const start_msg = `╭────《 OVL-MD 》─────⊷
-⫸  *Préfixe*       : ${config.prefixe}
+⫸  *Préfixe*       : ${config.PREFIXE}
 ⫸  *Mode*          : ${config.MODE}
 ⫸  *Commandes*     : ${evt.cmd.length}
 
