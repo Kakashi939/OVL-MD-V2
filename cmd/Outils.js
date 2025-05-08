@@ -19,18 +19,45 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-            const mess = `🌐 Bienvenue sur *OVL-MD-V2*, votre bot WhatsApp multi-device.🔍 Tapez *${prefixe}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD-V2 By *AINZ*`;
-            const img = 'https://telegra.ph/file/8173c870f9de5570db8c3.jpg';
-            await ovl.sendMessage(ms_org, { 
-                image: { url: img }, 
-                caption: mess 
-            }, { quoted: cmd_options.ms });
+            const response = await axios.get('https://raw.githubusercontent.com/ton_utilisateur/ton_repo/main/themes.json');
+            const themes = response.data;
+
+            const selectedTheme = themes.find(t => t.id == config.THEME);
+
+            if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
+
+            const hasImages = selectedTheme.images && selectedTheme.images.length > 0;
+            const hasVideos = selectedTheme.videos && selectedTheme.videos.length > 0;
+
+            if (!hasImages && !hasVideos) throw new Error("Aucun média disponible pour ce thème.");
+
+            const choix = hasImages && hasVideos
+                ? (Math.random() > 0.5 ? 'image' : 'video')
+                : (hasImages ? 'image' : 'video');
+
+            const lien = choix === 'image'
+                ? selectedTheme.images[Math.floor(Math.random() * selectedTheme.images.length)]
+                : selectedTheme.videos[Math.floor(Math.random() * selectedTheme.videos.length)];
+
+            const mess = `🌐 Bienvenue sur *OVL-MD-V2*, votre bot WhatsApp multi-device.🔍 Tapez *${config.PREFIXE}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD-V2 By *AINZ*`;
+
+            if (choix === 'image') {
+                await ovl.sendMessage(ms_org, { 
+                    image: { url: lien }, 
+                    caption: mess 
+                }, { quoted: cmd_options.ms });
+            } else {
+                await ovl.sendMessage(ms_org, { 
+                    video: { url: lien, gifPlayback: true }, 
+                    caption: mess 
+                }, { quoted: cmd_options.ms });
+            }
+
         } catch (error) {
             console.error("Erreur lors de l'envoi du message de test :", error.message || error);
         }
     }
 );
-
 
 ovlcmd(
     {
@@ -79,6 +106,50 @@ ovlcmd(
 );
 
 ovlcmd(
+  {
+    nom_cmd: "theme",
+    classe: "Outils",
+    react: "🎨",
+    desc: "Gérer les thèmes disponibles"
+  },
+  async (ms_org, ovl, cmd_options) => {
+    try {
+      const args = cmd_options.arg;
+      const rawUrl = 'https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json';
+
+      const { data: themesData } = await axios.get(rawUrl);
+
+      if (args.length === 0 || args[0] === "list") {
+        let msg = "*🎨 Liste des thèmes disponibles :*\n";
+        themesData.forEach((theme, i) => {
+          msg += `${i + 1}. ${theme.nom}\n`;
+        });
+        return await ovl.sendMessage(ms_org, { text: msg }, { quoted: cmd_options.ms });
+      }
+
+      const numero = parseInt(args[0], 10);
+      if (isNaN(numero) || numero < 1 || numero > themesData.length) {
+        return await ovl.sendMessage(ms_org, { text: "❌ Numéro invalide. Utilise : `theme list` pour voir les numéros valides." }, { quoted: cmd_options.ms });
+      }
+
+      const selectedTheme = themesData[numero - 1];
+      const themeId = selectedTheme.id;
+      const themeName = selectedTheme.nom;
+
+      const setPath = path.join(__dirname, '../set.js');
+      let contenu = fs.readFileSync(setPath, 'utf8');
+      contenu = contenu.replace(/THEME:\s*".*?"/, `THEME: "${themeId}"`);
+      fs.writeFileSync(setPath, contenu);
+
+      await ovl.sendMessage(ms_org, { text: `✅ Thème *${themeName}* sélectionné avec succès (ID: ${themeId}).` }, { quoted: cmd_options.ms });
+
+    } catch (err) {
+      await ovl.sendMessage(ms_org, { text: "❌ Une erreur est survenue lors du traitement de la commande." }, { quoted: cmd_options.ms });
+    }
+  }
+);
+
+ovlcmd(
     {
         nom_cmd: "menu",
         classe: "Outils",
@@ -98,7 +169,26 @@ ovlcmd(
             if (m > 0) uptime += `${m}M `;
             if (s > 0) uptime += `${s}S`;
 
-            const lien = `${config.MENU}`;
+            const response = await axios.get('https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json');
+            const themes = await response.data;
+
+            const selectedTheme = themes.find(t => t.id == config.THEME);
+
+            if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
+
+            const hasImages = selectedTheme.images && selectedTheme.images.length > 0;
+            const hasVideos = selectedTheme.videos && selectedTheme.videos.length > 0;
+
+            if (!hasImages && !hasVideos) throw new Error("Aucun média disponible pour ce thème.");
+
+            const choix = hasImages && hasVideos
+                ? (Math.random() > 0.5 ? 'image' : 'video')
+                : (hasImages ? 'image' : 'video');
+
+            const lien = choix === 'image'
+                ? selectedTheme.images[Math.floor(Math.random() * selectedTheme.images.length)]
+                : selectedTheme.videos[Math.floor(Math.random() * selectedTheme.videos.length)];
+
             const commandes = cmd;
             let menu = `╭───❏ 🄾🅅🄻 🄼🄳 ❏
 │ ✿ Prefixe => ${config.PREFIXE}
@@ -108,23 +198,18 @@ ovlcmd(
 │ ✿ Développeur => AINZ
 ╰══════════════⊷\n\n`;
 
-            // Regrouper les commandes par classe
             const cmd_classe = {};
             commandes.forEach((cmd) => {
-                if (!cmd_classe[cmd.classe]) {
-                    cmd_classe[cmd.classe] = [];
-                }
+                if (!cmd_classe[cmd.classe]) cmd_classe[cmd.classe] = [];
                 cmd_classe[cmd.classe].push(cmd);
             });
 
-            // Trier chaque classe par nom_cmd
             for (const [classe, cmds] of Object.entries(cmd_classe)) {
                 cmd_classe[classe] = cmds.sort((a, b) =>
                     a.nom_cmd.localeCompare(b.nom_cmd, undefined, { numeric: true })
                 );
             }
 
-            // Générer le menu
             for (const [classe, cmds] of Object.entries(cmd_classe)) {
                 menu += `╭───❏ ${classe} ❏\n`;
                 cmds.forEach((cmd) => {
@@ -133,10 +218,23 @@ ovlcmd(
                 menu += `╰═══════════════⊷\n\n`;
             }
 
-            menu += "> ©2025 OVL-MD WA-BOT";
-            await ovl.sendMessage(ms_org, { image: { url: lien }, caption: menu }, { quoted: cmd_options.ms });
+            menu += "> ©2025 OVL-MD-V2 WA-BOT";
+
+            if (choix === 'image') {
+                await ovl.sendMessage(ms_org, {
+                    image: { url: lien },
+                    caption: menu
+                }, { quoted: cmd_options.ms });
+            } else {
+                await ovl.sendMessage(ms_org, {
+                    video: { url: lien, gifPlayback: true },
+                    caption: menu
+                }, { quoted: cmd_options.ms });
+            }
+
         } catch (error) {
-            console.error("Erreur lors de la génération du menu :", error);
+            console.error("Erreur lors de la génération du menu :", error.message || error);
+            await ovl.sendMessage(ms_org, { text: "❌ Une erreur est survenue lors de la génération du menu." }, { quoted: cmd_options.ms });
         }
     }
 );
