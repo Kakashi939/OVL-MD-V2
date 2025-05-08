@@ -1,5 +1,5 @@
-const { ovlcmd } = require("../framework/ovlcmd");
-const textmaker = require("../framework/textmaker");
+const { ovlcmd } = require("../lib/ovlcmd");
+const textmaker = require("../lib/textmaker");
 
 function addTextproCommand(nom_cmd, text_pro_url, type) {
     ovlcmd(
