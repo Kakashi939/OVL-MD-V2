@@ -19,7 +19,7 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-            const mess = `🌐 Bienvenue sur *OVL-MD*, votre bot WhatsApp multi-device.🔍 Tapez *${prefixe}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD By *AINZ*`;
+            const mess = `🌐 Bienvenue sur *OVL-MD-V2*, votre bot WhatsApp multi-device.🔍 Tapez *${prefixe}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD-V2 By *AINZ*`;
             const img = 'https://telegra.ph/file/8173c870f9de5570db8c3.jpg';
             await ovl.sendMessage(ms_org, { 
                 image: { url: img }, 
@@ -53,7 +53,7 @@ ovlcmd(
                 );
 
                 if (commandeTrouvee) {
-                    const message = `📜 *Détails de la commande :*\n\n` +
+                    const message = `♻️*Détails de la commande :*\n\n` +
                         `Nom : *${commandeTrouvee.nom_cmd}*\n` +
                         `Alias : [${commandeTrouvee.alias.join(", ")}]\n` +
                         `Description : ${commandeTrouvee.desc}`;
@@ -65,7 +65,7 @@ ovlcmd(
                 }
             }
 
-            let descriptionMsg = "📜 *Liste des commandes disponibles :*\n\n";
+            let descriptionMsg = "♻️*Liste des commandes disponibles :*\n\n";
             commandes.forEach((cmd) => {
                 descriptionMsg += `Nom : *${cmd.nom_cmd}*\nAlias : [${cmd.alias.join(", ")}]\nDescription : ${cmd.desc}\n\n`;
             });
@@ -146,7 +146,7 @@ ovlcmd(
         nom_cmd: "vv",
         classe: "Outils",
         react: "👀",
-        desc: "Affiche un message envoyé en vue unique",
+        desc: "Affiche un message envoyé en vue unique dans la discussion",
     },
     async (ms_org, ovl, cmd_options) => {
         const { ms, msg_Repondu, repondre } = cmd_options;
@@ -212,6 +212,75 @@ ovlcmd(
 
 ovlcmd(
     {
+        nom_cmd: "vv2",
+        classe: "Outils",
+        react: "👀",
+        desc: "Affiche un message envoyé en vue unique en inbox",
+    },
+    async (ms_org, ovl, cmd_options) => {
+        const { ms, msg_Repondu, repondre } = cmd_options;
+
+        if (!msg_Repondu) {
+            return repondre("Veuillez mentionner un message en vue unique.");
+        }
+
+        let viewOnceKey = Object.keys(msg_Repondu).find(key => key.startsWith("viewOnceMessage"));
+        let vue_Unique_Message = msg_Repondu;
+
+        if (viewOnceKey) {
+            vue_Unique_Message = msg_Repondu[viewOnceKey].message;
+        }
+
+        if (vue_Unique_Message) {
+            if (
+                (vue_Unique_Message.imageMessage && vue_Unique_Message.imageMessage.viewOnce !== true) ||
+                (vue_Unique_Message.videoMessage && vue_Unique_Message.videoMessage.viewOnce !== true) ||
+                (vue_Unique_Message.audioMessage && vue_Unique_Message.audioMessage.viewOnce !== true)
+            ) {
+                return repondre("Ce message n'est pas un message en vue unique.");
+            }
+        }
+
+        try {
+            let media;
+            let options = { quoted: ms };
+
+            if (vue_Unique_Message.imageMessage) {
+                media = await ovl.dl_save_media_ms(vue_Unique_Message.imageMessage);
+                await ovl.sendMessage(
+                    ovl.user.id,
+                    { image: { url: media }, caption: vue_Unique_Message.imageMessage.caption || "" },
+                    options
+                );
+
+            } else if (vue_Unique_Message.videoMessage) {
+                media = await ovl.dl_save_media_ms(vue_Unique_Message.videoMessage);
+                await ovl.sendMessage(
+                    ovl.user.id,
+                    { video: { url: media }, caption: vue_Unique_Message.videoMessage.caption || "" },
+                    options
+                );
+
+            } else if (vue_Unique_Message.audioMessage) {
+                media = await ovl.dl_save_media_ms(vue_Unique_Message.audioMessage);
+                await ovl.sendMessage(
+                    ovl.user.id,
+                    { audio: { url: media }, mimetype: "audio/mp4", ptt: false },
+                    options
+                );
+
+            } else {
+                return repondre("Ce type de message en vue unique n'est pas pris en charge.");
+            }
+        } catch (_error) {
+            console.error("❌ Erreur lors de l'envoi du message en vue unique :", _error.message || _error);
+            return repondre("Une erreur est survenue lors du traitement du message.");
+        }
+    }
+);
+
+ovlcmd(
+    {
         nom_cmd: "ping",
         classe: "Outils",
         react: "🏓",
@@ -219,10 +288,10 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options ) => {
         const start = Date.now();
-        await ovl.sendMessage(ms_org, { text: "Ping..." }, { quoted: cmd_options.ms });
+        await ovl.sendMessage(ms_org, { text: "*OVL-MD-V2 Ping...*" }, { quoted: cmd_options.ms });
         const end = Date.now();
         const latency = end - start;
-        await ovl.sendMessage(ms_org, { text: `🏓 Pong ! Latence : ${latency}ms` }, { quoted: cmd_options.ms });
+        await ovl.sendMessage(ms_org, { text: `*🏓 Pong ! Latence : ${latency}ms*` }, { quoted: cmd_options.ms });
     }
 );
 
@@ -281,7 +350,7 @@ ovlcmd(
     }
 );
 
-/*const apiKeys = [
+const apiKeys = [
   'eb1ac1cc00374b7eab9ce2cfdc0f32c1',
   '7da8a6dfb4e14b9a94eae88c0e28d91b',
   'd945dda8cec14d93abcfdc34699d6972',
@@ -317,7 +386,7 @@ async function captureScreenshot(url) {
     }
   }
   throw new Error('Impossible de récupérer la capture d\'écran, toutes les clés API ont échoué.');
-}*/
+}
 
 ovlcmd(
   {
@@ -335,19 +404,13 @@ ovlcmd(
       }, { quoted: ms });
     }
 
-  /*  const url = arg[0];
+      const url = arg[0];
 
     try {
       const screenshot = await captureScreenshot(url);
 
       await ovl.sendMessage(ms_org, {
         image:  Buffer.from(screenshot),
-        caption: `Voici la capture d'écran de: ${url}`,
-      });
-*/
-      try { 
-          await ovl.sendMessage(ms_org, {
-        image: `https://image.thum.io/get/fullpage/${arg[0]}`,
         caption: `Voici la capture d'écran de: ${url}`,
       }, { quoted: ms });
     } catch (error) {
