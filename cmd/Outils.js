@@ -19,7 +19,7 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-             const response = await axios.get('https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/main/themes.json');
+             const response = await axios.get('https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json');
             const themes = response.data;
 
             const selectedTheme = themes.find(t => t.id == config.THEME);
@@ -169,7 +169,7 @@ ovlcmd(
             if (m > 0) uptime += `${m}M `;
             if (s > 0) uptime += `${s}S`;
 
-            const response = await axios.get('https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/main/themes.json');
+            const response = await axios.get('https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json');
             const themes = await response.data;
 
             const selectedTheme = themes.find(t => t.id == config.THEME);
