@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 dotenv.config();
+
 module.exports = {
   PREFIXE: process.env.PREFIXE || "",
   NOM_OWNER: process.env.NOM_OWNER || "Ainz",
