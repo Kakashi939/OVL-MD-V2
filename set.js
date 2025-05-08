@@ -12,4 +12,5 @@ module.exports = {
   STICKER_AUTHOR_NAME: process.env.STICKER_AUTHOR_NAME || "OVL-MD",
   DATABASE: process.env.DATABASE,
   RENDER_API_KEY: process.env.RENDER_API_KEY,
+  THEME: "1"
 };
