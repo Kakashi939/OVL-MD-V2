@@ -22,7 +22,7 @@ ovlcmd(
              const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
 
             const { data: themes } = await axios.get(rawUrl);
-
+console.log(themes);
             const selectedTheme = themes.find(t => t.id == config.THEME);
             if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
 
@@ -172,7 +172,7 @@ ovlcmd(
             const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
 
             const { data: themes } = await axios.get(rawUrl);
-
+console.log(themes);
             const selectedTheme = themes.find(t => t.id == config.THEME);
 
             if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
