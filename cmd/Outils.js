@@ -19,11 +19,11 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-             const response = await axios.get('https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json');
-            const themes = response.data;
+             const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
+
+            const { data: themes } = await axios.get(rawUrl);
 
             const selectedTheme = themes.find(t => t.id == config.THEME);
-
             if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
 
             const hasImages = selectedTheme.images && selectedTheme.images.length > 0;
@@ -169,8 +169,9 @@ ovlcmd(
             if (m > 0) uptime += `${m}M `;
             if (s > 0) uptime += `${s}S`;
 
-            const response = await axios.get('https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json');
-            const themes = await response.data;
+            const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
+
+            const { data: themes } = await axios.get(rawUrl);
 
             const selectedTheme = themes.find(t => t.id == config.THEME);
 
