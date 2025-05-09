@@ -19,7 +19,7 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-             const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
+             const rawUrl = 'https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json';
 
             const { data: themes } = await axios.get(rawUrl);
 
@@ -115,7 +115,7 @@ ovlcmd(
   async (ms_org, ovl, cmd_options) => {
     try {
       const args = cmd_options.arg;
-      const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
+      const rawUrl = 'https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json';
 
       const { data: themesData } = await axios.get(rawUrl);
 
@@ -169,7 +169,7 @@ ovlcmd(
             if (m > 0) uptime += `${m}M `;
             if (s > 0) uptime += `${s}S`;
 
-            const rawUrl = 'https://cdn.jsdelivr.net/gh/Ainz-devs/OVL-THEME/themes.json';
+            const rawUrl = 'https://raw.githubusercontent.com/Ainz-devs/OVL-THEME/refs/heads/main/themes.json';
 
             const { data: themes } = await axios.get(rawUrl);
 
