@@ -501,7 +501,7 @@ ovlcmd(
         const rmImage = `https://fastrestapis.fasturl.cloud/aiimage/upscale?resize=8&imageUrl=${encodeURIComponent(url)}`;
         
         await ovl.sendMessage(ms_org, {
-          image: rmImage,
+          image: rmImage.data,
           caption: `\`\`\`Powered By OVL-MD\`\`\``,
         }, { quoted: ms });
       } catch (err) {
