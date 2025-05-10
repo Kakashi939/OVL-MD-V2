@@ -498,7 +498,7 @@ ovlcmd(
           return ovl.sendMessage(ms_org, { text: "Impossible de télécharger l'image. Réessayez." }, { quoted: ms });
         }
         const url = uploadToCatbox(image);
-        const rmImage = await axios.get(`https://fastrestapis.fasturl.cloud/aiimage/upscale?resize=8&imageUrl=${encodeURIComponent(url)}`, {
+        const rmImage = await axios.get(`https://fastrestapis.fasturl.cloud/aiimage/upscale?resize=8&imageUrl=${url}`, {
         responseType: 'arraybuffer',
       }); 
 	      
