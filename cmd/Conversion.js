@@ -1,4 +1,4 @@
-const { ovlcmd } = require("../framework/ovlcmd");
+const { ovlcmd } = require("../lib/ovlcmd");
 const fs = require("fs");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const { execSync, exec } = require("child_process");
