@@ -141,7 +141,7 @@ ovlcmd(
       contenu = contenu.replace(/THEME:\s*".*?"/, `THEME: "${themeId}"`);
       fs.writeFileSync(setPath, contenu);
 
-      await ovl.sendMessage(ms_org, { text: `✅ Thème *${themeName}* sélectionné avec succès (ID: ${themeId}).` }, { quoted: cmd_options.ms });
+      await ovl.sendMessage(ms_org, { text: `✅ Thème *${themeName}* sélectionné avec succès` }, { quoted: cmd_options.ms });
 
     } catch (err) {
       await ovl.sendMessage(ms_org, { text: "❌ Une erreur est survenue lors du traitement de la commande." }, { quoted: cmd_options.ms });
