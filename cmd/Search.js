@@ -95,7 +95,7 @@ ovlcmd(
       const buffer = await ovl.dl_save_media_ms(mediaMessage);
 
       const form = new FormData();
-      form.append("file", buffer, { filename: "audio.mp3" });
+      form.append("file", buffer, { filename: "audio.mp4" });
       form.append("return", "apple_music,spotify");
       form.append("api_token", "test");
 
@@ -104,7 +104,7 @@ ovlcmd(
       });
 
       const result = response.data.result;
-
+console.log(result);
       if (!result || !result.title) return repondre("Aucune chanson reconnue.");
 
       const msg = `🎶 *Résultat :*\n\n` +
