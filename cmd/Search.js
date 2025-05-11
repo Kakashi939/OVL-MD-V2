@@ -9,6 +9,10 @@ const ytsr = require('@distube/ytsr');
 const LyricsFinder = require('@faouzkk/lyrics-finder');
 const { search, download } = require("aptoide_scrapper_fixed");
 const FormData = require('form-data');
+const fs = require('fs');
+const path = require('path');
+const ffmpeg = require('fluent-ffmpeg');
+const tmp = require('tmp');
 
 ovlcmd(
     {
@@ -81,55 +85,62 @@ ovlcmd(
   {
     nom_cmd: "shazam",
     classe: "Search",
-    react: "🎶",
-    desc: "Identifie une chanson à partir d'un audio ou d'une vidéo."
+    desc: "Identifie une chanson à partir d'un audio ou d'une vidéo.",
   },
   async (ms_org, ovl, cmd_options) => {
     const { msg_Repondu, repondre } = cmd_options;
 
     const mediaMessage = msg_Repondu?.audioMessage || msg_Repondu?.videoMessage;
 
-    if (!mediaMessage) return repondre("Réponds à un message audio ou vidéo pour identifier la chanson.");
+    if (!mediaMessage) return repondre("Réponds à un message audio ou vidéo.");
 
     try {
       const buffer = await ovl.dl_save_media_ms(mediaMessage);
 
-      const form = new FormData();
-      form.append("api_token", "test");
-      form.append("return", "apple_music,spotify");
-      form.append("file", buffer, { filename: "audio.mp3" });
+      const inputPath = tmp.tmpNameSync({ postfix: '.webm' }); // Ou .ogg/.mp4 selon ce que tu reçois
+      const outputPath = tmp.tmpNameSync({ postfix: '.mp3' });
 
-      const response = await axios.post("https://api.audd.io/", form, {
+      fs.writeFileSync(inputPath, buffer);
+
+      await new Promise((resolve, reject) => {
+        ffmpeg(inputPath)
+          .audioCodec('libmp3lame')
+          .format('mp3')
+          .duration(10)
+          .on('end', resolve)
+          .on('error', reject)
+          .save(outputPath);
+      });
+
+      const form = new FormData();
+      form.append('api_token', 'test');
+      form.append('return', 'apple_music,spotify');
+      form.append('file', fs.createReadStream(outputPath));
+
+      const response = await axios.post('https://api.audd.io/', form, {
         headers: form.getHeaders()
       });
 
-      const data = response.data;
-      console.log("Données reçues de l'API Audd.io :", data);
+      fs.unlinkSync(inputPath);
+      fs.unlinkSync(outputPath);
 
-      if (data.status === "error") {
-        return repondre("Erreur API : " + (data.error?.error_message || "Échec de la reconnaissance."));
-      }
-
-      const result = data.result;
+      const result = response.data.result;
+      console.log("Réponse Audd.io :", response.data);
 
       if (!result || !result.title) return repondre("Aucune chanson reconnue.");
 
-      const msg =
-        `Résultat :\n\n` +
-        `Titre : ${result.title}\n` +
-        `Artiste : ${result.artist}\n` +
-        `Album : ${result.album || "Inconnu"}\n` +
-        `Sortie : ${result.release_date || "Inconnue"}\n` +
-        `Durée : ${result.timecode || "N/A"}\n` +
-        `Lien : ${result.song_link || "Aucun"}`;
+      const msg = `Résultat :
+Titre : ${result.title}
+Artiste : ${result.artist}
+Album : ${result.album || "Inconnu"}
+Sortie : ${result.release_date || "Inconnue"}
+Durée : ${result.timecode || "N/A"}
+Lien : ${result.song_link || "Aucun"}`;
 
       repondre(msg);
     } catch (err) {
-      console.error("Erreur complète :", err);
-      if (err.response?.data?.error?.error_message) {
-        return repondre("Erreur API : " + err.response.data.error.error_message);
-      }
-      repondre("Une erreur est survenue pendant l'identification.");
+      console.error("Erreur :", err);
+      repondre("Erreur pendant l'identification.");
     }
   }
 );
