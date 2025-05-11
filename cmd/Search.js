@@ -8,6 +8,7 @@ const { translate } = require('@vitalets/google-translate-api');
 const ytsr = require('@distube/ytsr');
 const LyricsFinder = require('@faouzkk/lyrics-finder');
 const { search, download } = require("aptoide_scrapper_fixed");
+const FormData = require('form-data');
 
 ovlcmd(
     {
@@ -79,7 +80,7 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "shazam",
-    classe: "search",
+    classe: "Search",
     react: "🎶",
     desc: "Identifie une chanson à partir d'un audio ou d'une vidéo."
   },
