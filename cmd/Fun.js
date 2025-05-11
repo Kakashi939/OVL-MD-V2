@@ -208,7 +208,7 @@ ovlcmd(
       }
 
       await ovl.sendMessage(ms_org, {
-        image: { url: meme.url },
+        video: { url: meme.url },
         caption: ''
       }, { quoted: ms });
 
