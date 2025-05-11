@@ -95,18 +95,23 @@ ovlcmd(
       const buffer = await ovl.dl_save_media_ms(mediaMessage);
 
       const form = new FormData();
-      form.append("file", buffer, { filename: "audio.mp4" });
+      form.append("api_token", "test");
+      form.append("return", "apple_music,spotify");
+      form.append("file", buffer, { filename: "audio.mp3" });
 
       const response = await axios.post("https://api.audd.io/", form, {
-        headers: form.getHeaders(),
-        params: {
-          api_token: "test",
-          return: "apple_music,spotify"
-        }
+        headers: form.getHeaders()
       });
 
-      const result = response.data.result;
-console.log(response.data);
+      const data = response.data;
+      console.log("Données reçues de l'API Audd.io :", data);
+
+      if (data.status === "error") {
+        return repondre("Erreur API : " + (data.error?.error_message || "Échec de la reconnaissance."));
+      }
+
+      const result = data.result;
+
       if (!result || !result.title) return repondre("Aucune chanson reconnue.");
 
       const msg =
@@ -120,7 +125,10 @@ console.log(response.data);
 
       repondre(msg);
     } catch (err) {
-      console.error(err);
+      console.error("Erreur complète :", err);
+      if (err.response?.data?.error?.error_message) {
+        return repondre("Erreur API : " + err.response.data.error.error_message);
+      }
       repondre("Une erreur est survenue pendant l'identification.");
     }
   }
