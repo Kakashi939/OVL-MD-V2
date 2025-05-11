@@ -198,7 +198,7 @@ ovlcmd(
     react: "🤣",
     desc: "Renvoie un mème aléatoire",
   },
-  async (ms_org, ovl, { repondre }) => {
+  async (ms_org, ovl, { repondre, ms }) => {
     try {
       const response = await axios.get('https://meme-api.com/gimme');
       const meme = response.data;
@@ -210,7 +210,7 @@ ovlcmd(
       await ovl.sendMessage(ms_org, {
         image: { url: meme.url },
         caption: ''
-      }, { quoted: ms_org });
+      }, { quoted: ms });
 
     } catch (err) {
       console.error(err);
