@@ -104,7 +104,7 @@ ovlcmd(
       });
 
       const result = response.data.result;
-console.log(result);
+console.log(response.data);
       if (!result || !result.title) return repondre("Aucune chanson reconnue.");
 
       const msg = `🎶 *Résultat :*\n\n` +
