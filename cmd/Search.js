@@ -96,24 +96,27 @@ ovlcmd(
 
       const form = new FormData();
       form.append("file", buffer, { filename: "audio.mp4" });
-      form.append("return", "apple_music,spotify");
-      form.append("api_token", "test");
 
       const response = await axios.post("https://api.audd.io/", form, {
         headers: form.getHeaders(),
+        params: {
+          api_token: "test",
+          return: "apple_music,spotify"
+        }
       });
 
       const result = response.data.result;
-console.log(response.data);
+
       if (!result || !result.title) return repondre("Aucune chanson reconnue.");
 
-      const msg = `🎶 *Résultat :*\n\n` +
-                  `🎧 *Titre* : ${result.title}\n` +
-                  `🎤 *Artiste* : ${result.artist}\n` +
-                  `💿 *Album* : ${result.album || "Inconnu"}\n` +
-                  `📅 *Sortie* : ${result.release_date || "Inconnue"}\n` +
-                  `⏱️ *Durée* : ${result.timecode || "N/A"}\n` +
-                  `🔗 *Lien* : ${result.song_link || "Aucun"}`;
+      const msg =
+        `Résultat :\n\n` +
+        `Titre : ${result.title}\n` +
+        `Artiste : ${result.artist}\n` +
+        `Album : ${result.album || "Inconnu"}\n` +
+        `Sortie : ${result.release_date || "Inconnue"}\n` +
+        `Durée : ${result.timecode || "N/A"}\n` +
+        `Lien : ${result.song_link || "Aucun"}`;
 
       repondre(msg);
     } catch (err) {
