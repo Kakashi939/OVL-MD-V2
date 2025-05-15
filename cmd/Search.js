@@ -9,10 +9,7 @@ const ytsr = require('@distube/ytsr');
 const LyricsFinder = require('@faouzkk/lyrics-finder');
 const { search, download } = require("aptoide_scrapper_fixed");
 const FormData = require('form-data');
-const fs = require('fs');
-const path = require('path');
-const ffmpeg = require('fluent-ffmpeg');
-const tmp = require('tmp');
+
 
 ovlcmd(
     {
@@ -85,62 +82,57 @@ ovlcmd(
   {
     nom_cmd: "shazam",
     classe: "Search",
-    desc: "Identifie une chanson à partir d'un audio ou d'une vidéo.",
+    react: "🎶",
+    desc: "Identifie une chanson à partir d'un audio ou d'une vidéo."
   },
   async (ms_org, ovl, cmd_options) => {
     const { msg_Repondu, repondre } = cmd_options;
 
     const mediaMessage = msg_Repondu?.audioMessage || msg_Repondu?.videoMessage;
 
-    if (!mediaMessage) return repondre("Réponds à un message audio ou vidéo.");
+    if (!mediaMessage) return repondre("Réponds à un message audio ou vidéo pour identifier la chanson.");
 
     try {
       const buffer = await ovl.dl_save_media_ms(mediaMessage);
 
-      const inputPath = tmp.tmpNameSync({ postfix: '.webm' }); // Ou .ogg/.mp4 selon ce que tu reçois
-      const outputPath = tmp.tmpNameSync({ postfix: '.mp3' });
-
-      fs.writeFileSync(inputPath, buffer);
-
-      await new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
-          .audioCodec('libmp3lame')
-          .format('mp3')
-          .duration(10)
-          .on('end', resolve)
-          .on('error', reject)
-          .save(outputPath);
-      });
-
       const form = new FormData();
-      form.append('api_token', 'test');
-      form.append('return', 'apple_music,spotify');
-      form.append('file', fs.createReadStream(outputPath));
+      form.append("file", buffer, { filename: "audio.mp3" });
+      form.append("api_token", "test"); // Remplace "test" par ton vrai token entreprise
+      form.append("accurate_offsets", "true");
+      form.append("skip", "3");
+      form.append("every", "1");
 
-      const response = await axios.post('https://api.audd.io/', form, {
-        headers: form.getHeaders()
+      const response = await axios.post("https://enterprise.audd.io/", form, {
+        headers: form.getHeaders(),
       });
 
-      fs.unlinkSync(inputPath);
-      fs.unlinkSync(outputPath);
+      const data = response.data;
+      console.log("Données reçues de l'API Audd.io :", data);
 
-      const result = response.data.result;
-      console.log("Réponse Audd.io :", response.data);
+      if (data.status === "error") {
+        return repondre("Erreur API : " + (data.error?.error_message || "Échec de la reconnaissance."));
+      }
+
+      const result = data.result;
 
       if (!result || !result.title) return repondre("Aucune chanson reconnue.");
 
-      const msg = `Résultat :
-Titre : ${result.title}
-Artiste : ${result.artist}
-Album : ${result.album || "Inconnu"}
-Sortie : ${result.release_date || "Inconnue"}
-Durée : ${result.timecode || "N/A"}
-Lien : ${result.song_link || "Aucun"}`;
+      const msg =
+        `🎶 *Résultat de l'identification :*\n\n` +
+        `🎧 *Titre* : ${result.title}\n` +
+        `🎤 *Artiste* : ${result.artist}\n` +
+        `📀 *Album* : ${result.album || "Inconnu"}\n` +
+        `📅 *Date de sortie* : ${result.release_date || "Inconnue"}\n` +
+        `⏱️ *Durée repérée* : ${result.timecode || "N/A"}\n` +
+        `🔗 *Lien* : ${result.song_link || "Aucun disponible"}`;
 
       repondre(msg);
     } catch (err) {
-      console.error("Erreur :", err);
-      repondre("Erreur pendant l'identification.");
+      console.error("Erreur complète :", err);
+      if (err.response?.data?.error?.error_message) {
+        return repondre("Erreur API : " + err.response.data.error.error_message);
+      }
+      repondre("Une erreur est survenue pendant l'identification.");
     }
   }
 );
