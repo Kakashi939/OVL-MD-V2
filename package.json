@@ -34,7 +34,7 @@
     "node-catbox": "^3.3.0",
     "node-fetch": "3.2.2",
     "os": "^0.1.2",
-    "ovl_wa_baileys": "^1.0.1",
+    "ovl_wa_baileys": "github:WhiskeySockets/Baileys",
     "path": "^0.12.7",
     "pg": "^8.13.1",
     "pino": "^8.1.0",
