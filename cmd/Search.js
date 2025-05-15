@@ -96,7 +96,7 @@ ovlcmd(
       const buffer = await ovl.dl_save_media_ms(mediaMessage);
 
       const form = new FormData();
-      form.append("file", buffer, { filename: "audio.mp3" });
+      form.append("file", buffer, { filename: "audio.mp4" });
       form.append("api_token", "test"); // Remplace "test" par ton vrai token entreprise
       form.append("accurate_offsets", "true");
       form.append("skip", "3");
