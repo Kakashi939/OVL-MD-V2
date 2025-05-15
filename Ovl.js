@@ -8,7 +8,6 @@ const {
     useMultiFileAuthState,
     logger,
     makeCacheableSignalKeyStore,
-    makeInMemoryStore,
     fetchLatestBaileysVersion,
     Browsers,
     downloadContentFromMessage,
@@ -42,8 +41,7 @@ async function main() {
     const { state, saveCreds } = await useMultiFileAuthState('./auth');
 
     try {
-        const store = makeInMemoryStore({ logger: pino().child({ level: "silent", stream: "store" }) });
-
+        
         const ovl = makeWASocket({
             printQRInTerminal: true,
             logger: pino({ level: "silent" }),
@@ -54,10 +52,7 @@ async function main() {
                 creds: state.creds,
                 keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }))
             },
-            getMessage: async (key) => {
-                const msg = await store.loadMessage(key.remoteJid, key.id);
-                return msg?.message;
-            }
+            
         });
 
         store.bind(ovl.ev);
