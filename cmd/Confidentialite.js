@@ -197,7 +197,7 @@ ovlcmd(
         settings.like_status = 'non';
         await settings.save();
         return repondre("Les likes sur les statuts sont maintenant désactivés.");
-      } else {
+      } else if (sousCommande !== 'off'){
         settings.like_status = sousCommande;
         await settings.save();
         return repondre("Les likes sur les statuts sont maintenant activés.");
