@@ -112,7 +112,7 @@ async function message_upsert(m, ovl) {
     rankAndLevelUp(ovl, ms_org, texte, sender, senderName, config);
     presence(ovl, ms_org);
     lecture_status(ovl, ms, ms_org);
-    like_status(ovl, ms, ms_org);
+    like_status(ovl, ms, ms_org, id_Bot);
     dl_status(ovl, ms_org, ms);
     antivv(ovl, ms);
     antidelete(ovl, ms, sender, mtype, getMessage);
