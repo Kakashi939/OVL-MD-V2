@@ -603,7 +603,7 @@ ovlcmd(
     desc: "Epingle des messages",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms, arg } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms, msg_Repondu, arg } = cmd_options;
 
     if (!verif_Groupe) 
       return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
