@@ -449,44 +449,6 @@ ovlcmd(
     }
 );
 
-const apiKeys = [
-  'eb1ac1cc00374b7eab9ce2cfdc0f32c1',
-  '7da8a6dfb4e14b9a94eae88c0e28d91b',
-  'd945dda8cec14d93abcfdc34699d6972',
-  'ac178ffa00c643dab03d520b20f55834',
-  '03cfff7ed6694c7bbb516582d945c996',
-  '0884920bcc334ff8974289ee96f03d70',
-  'c40c653724d34e6db1f2f4be05a31e90',
-  'aad767f8993f42c881b43ba72138d449',
-  '970b11fa69ca4edb936a73a74c003380',
-  '751ef792c29b465492ec455d6d6e5ddf',
-  '3348a0db815243b782fbc88041527d1a',
-  '3f1206ea1cc64243bcf975260ab74fd4',
-  '8320407ae8b54d5dae19c518dcab5e18',
-  '495bb083bc51463faab491fc2226bbba',
-  '37bc96866acb47a98bc4ed058684d2db'
-];
-
-async function captureScreenshot(url) {
-  for (const apiKey of apiKeys) {
-    try {
-      const apiUrl = `https://api.apiflash.com/v1/urltoimage?access_key=${apiKey}&wait_until=page_loaded&url=${url}`;
-      console.log(`Essai avec la clé API: ${apiKey}`); // Log pour vérifier quelle clé est utilisée
-      const response = await axios.get(apiUrl, {
-      responseType: "arraybuffer",
-      headers: {
-        "User-Agent": "GoogleBot",
-      },
-    });
-      console.log('Capture réussie avec la clé API:', apiKey); // Log pour succès
-      return response.data;
-    } catch (error) {
-      console.error(`Erreur avec la clé API ${apiKey}:`, error.message); // Log d'erreur
-    }
-  }
-  throw new Error('Impossible de récupérer la capture d\'écran, toutes les clés API ont échoué.');
-}
-
 ovlcmd(
   {
     nom_cmd: "capture",
@@ -506,10 +468,12 @@ ovlcmd(
       const url = arg[0];
 
     try {
-      const screenshot = await captureScreenshot(url);
+      const screenshot = await axios.get(`https://api.kenshiro.cfd/api/tools/ssweb?url=${encodeURIComponent(url)}&type=mobile&mode=dark`, {
+        responseType: 'arraybuffer',
+      }); 
 
       await ovl.sendMessage(ms_org, {
-        image:  Buffer.from(screenshot),
+        image:  screenshot.data, 
         caption: `Voici la capture d'écran de: ${url}`,
       }, { quoted: ms });
     } catch (error) {
