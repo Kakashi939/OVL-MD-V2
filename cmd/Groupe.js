@@ -623,8 +623,7 @@ ovlcmd(
       const msg = `📌 *Épingler un message*\n\nChoisissez une durée pour épingler le message cité :\n\n1️⃣ - 24h\n2️⃣ - 7 jours\n3️⃣ - 30 jours\n\nExemple : *pin 1* pour épingler pendant 24h.`;
       return ovl.sendMessage(jid, { text: msg }, { quoted: ms });
     }
-
-    const quotedMessage = ms?.quoted;
+      
     if (!quotedMessage) {
       return ovl.sendMessage(jid, { text: "Veuillez répondre au message à épingler." }, { quoted: ms });
     }
@@ -633,7 +632,7 @@ ovlcmd(
       pin: {
         type: 1,
         time: durations[choix],
-        key: quotedMessage.key
+        key: msg_Repondu.key
       }
     });
 
