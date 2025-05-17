@@ -170,7 +170,7 @@ ovlcmd(
     nom_cmd: "poll",
     classe: "Groupe",
     react: "📊",
-    desc: "Crée un sondage dans le groupe.",
+    desc: "Crée un sondage dans le groupe(plusieurs votés autorisé).",
   },
   async (dest, ovl, cmd_options) => {
     try {
@@ -197,6 +197,51 @@ ovlcmd(
           poll: {
             name: pollName,
             values: options,
+          },
+        }, { quoted: ms });
+      } else {
+        repondre('Seuls les administrateurs peuvent utiliser cette commande.');
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du sondage :", error);
+      repondre("Une erreur est survenue lors de la création du sondage.");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "poll2",
+    classe: "Groupe",
+    react: "📊",
+    desc: "Crée un sondage dans le groupe(un seul vote autorisé).",
+  },
+  async (dest, ovl, cmd_options) => {
+    try {
+      const { ms, repondre, arg, verif_Groupe, infos_Groupe, nom_Auteur_Message, verif_Admin } = cmd_options;
+
+      if (!verif_Groupe) {
+        return repondre("Cette commande ne fonctionne que dans les groupes.");
+      }
+
+      let [pollName, pollOptions] = arg.join(' ').split(';');
+
+      if (!pollOptions) {
+        return repondre("Veuillez fournir une question suivie des options, séparées par des virgules. Exemple : poll question;option1,option2,option3");
+      }
+
+      let options = pollOptions.split(',').map(option => option.trim()).filter(option => option.length > 0);
+
+      if (options.length < 2) {
+        return repondre("Le sondage doit contenir au moins deux options.");
+      }
+      
+      if (verif_Admin) {
+        await ovl.sendMessage(dest, {
+          poll: {
+            name: pollName,
+            values: options,
+            selectableCount: 1,
           },
         }, { quoted: ms });
       } else {
@@ -547,6 +592,52 @@ ovlcmd(
 
       await ovl.groupUpdateSubject(jid, name);
     } else { ovl.sendMessage(jid, { text: 'je n\'ai pas les droits requis pour exécuter cette commande' }, { quoted: ms }) }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "pin",
+    classe: "Groupe",
+    react: "✅",
+    desc: "Epingle des messages",
+  },
+  async (jid, ovl, cmd_options) => {
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms, arg } = cmd_options;
+
+    if (!verif_Groupe) 
+      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
+
+    if (!verif_Admin || !verif_Ovl_Admin)
+      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." }, { quoted: ms });
+
+    const durations = {
+      "1": 86400,    // 24h
+      "2": 604800,   // 7 jours
+      "3": 2592000   // 30 jours
+    };
+
+    const choix = arg[0];
+
+    if (!choix || !["1", "2", "3"].includes(choix)) {
+      const msg = `📌 *Épingler un message*\n\nChoisissez une durée pour épingler le message cité :\n\n1️⃣ - 24h\n2️⃣ - 7 jours\n3️⃣ - 30 jours\n\nExemple : *pin 1* pour épingler pendant 24h.`;
+      return ovl.sendMessage(jid, { text: msg }, { quoted: ms });
+    }
+
+    const quotedMessage = ms?.quoted;
+    if (!quotedMessage) {
+      return ovl.sendMessage(jid, { text: "Veuillez répondre au message à épingler." }, { quoted: ms });
+    }
+
+    await ovl.groupSettingUpdate(jid, {
+      pin: {
+        type: 1,
+        time: durations[choix],
+        key: quotedMessage.key
+      }
+    });
+
+    return ovl.sendMessage(jid, { text: `📌 Message épinglé pour ${choix === "1" ? "24h" : choix === "2" ? "7 jours" : "30 jours"} avec succès.` }, { quoted: ms });
   }
 );
 
