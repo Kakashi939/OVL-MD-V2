@@ -30,13 +30,12 @@ async function connection_update(con, ovl, main) {
         }
 
         await delay(700);
-
-        const start_msg = `╭────《 OVL-MD 》─────⊷
-⫸  *Préfixe*       : ${config.PREFIXE}
-⫸  *Mode*          : ${config.MODE}
-⫸  *Commandes*     : ${evt.cmd.length}
-
-             𝙈𝙖𝙙𝙚 𝙗𝙮 Ainz`;
+        const start_msg = `߷ Etat ➽ Connecté✅
+߷ Préfixe ➽ ${config.PREFIXE}
+߷ Mode ➽ ${config.MODE}
+߷ cmds ➽ ${evt.cmd.length}
+߷ Version ➽ 2.0.0
+߷ Développeur ➽  Ainz`;
 
         if (ovl.user && ovl.user.id) {
             await ovl.sendMessage(ovl.user.id, { text: start_msg });
