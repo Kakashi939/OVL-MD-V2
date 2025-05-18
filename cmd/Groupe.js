@@ -603,14 +603,14 @@ ovlcmd(
     desc: "Epingle des messages",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms, msg_Repondu, arg } = cmd_options;
-
-    if (!verif_Groupe) 
-      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
-
-    if (!verif_Admin || !verif_Ovl_Admin)
-      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." }, { quoted: ms });
-
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms, arg, auteur_Message, dev_id, msg_Repondu } = cmd_options;
+      
+    if (verif_Groupe) {
+      if (!verif_Admin) return repondre("Vous devez être administrateur pour épinglé un message dans le groupe.");
+      if (!verif_Ovl_Admin) return repondre("Je dois être administrateur pour effectuer cette action.");
+    } else {
+      if (!(dev_id || auteur_Message === id_Bot)) return repondre("Cette commande ne peut être utilisée ici que par un développeur ou pour ses propres messages.");
+    }
     const durations = {
       "1": 86400,    // 24h
       "2": 604800,   // 7 jours
@@ -624,15 +624,20 @@ ovlcmd(
       return ovl.sendMessage(jid, { text: msg }, { quoted: ms });
     }
       
-    if (!quotedMessage) {
+    if (!msg_Repondu) {
       return ovl.sendMessage(jid, { text: "Veuillez répondre au message à épingler." }, { quoted: ms });
     }
-
+      const key = {
+        remoteJid: ms_org,
+        fromMe: auteur_Msg_Repondu === id_Bot,
+        id: ms.message.extendedTextMessage.contextInfo.stanzaId,
+        participant: auteur_Msg_Repondu,
+      };
     await ovl.groupSettingUpdate(jid, {
       pin: {
         type: 1,
         time: durations[choix],
-        key: msg_Repondu.key
+        key: key
       }
     });
 
