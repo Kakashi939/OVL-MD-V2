@@ -26,19 +26,7 @@ ovlcmd(
             const selectedTheme = themes.find(t => t.id == config.THEME);
             if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
 
-            const hasImages = selectedTheme.images && selectedTheme.images.length > 0;
-            const hasVideos = selectedTheme.videos && selectedTheme.videos.length > 0;
-
-            if (!hasImages && !hasVideos) throw new Error("Aucun média disponible pour ce thème.");
-
-            const choix = hasImages && hasVideos
-                ? (Math.random() > 0.5 ? 'image' : 'video')
-                : (hasImages ? 'image' : 'video');
-
-            const lien = choix === 'image'
-                ? selectedTheme.images[Math.floor(Math.random() * selectedTheme.images.length)]
-                : selectedTheme.videos[Math.floor(Math.random() * selectedTheme.videos.length)];
-
+            const lien = selectedTheme.theme[Math.floor(Math.random() * selectedTheme.theme.length)];
             const mess = `🌐 Bienvenue sur *OVL-MD-V2*, votre bot WhatsApp multi-device.🔍 Tapez *${config.PREFIXE}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD-V2 By *AINZ*`;
 
             if (choix === 'image') {
@@ -177,18 +165,7 @@ ovlcmd(
 
             if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
 
-            const hasImages = selectedTheme.images && selectedTheme.images.length > 0;
-            const hasVideos = selectedTheme.videos && selectedTheme.videos.length > 0;
-
-            if (!hasImages && !hasVideos) throw new Error("Aucun média disponible pour ce thème.");
-
-            const choix = hasImages && hasVideos
-                ? (Math.random() > 0.5 ? 'image' : 'video')
-                : (hasImages ? 'image' : 'video');
-
-            const lien = choix === 'image'
-                ? selectedTheme.images[Math.floor(Math.random() * selectedTheme.images.length)]
-                : selectedTheme.videos[Math.floor(Math.random() * selectedTheme.videos.length)];
+            const lien = selectedTheme.theme[Math.floor(Math.random() * selectedTheme.theme.length)];
 
             const commandes = cmd;
             let menu = `╭───❏ 🄾🅅🄻 🄼🄳 ❏
@@ -221,17 +198,18 @@ ovlcmd(
 
             menu += "> ©2025 OVL-MD-V2 WA-BOT";
 
-            if (choix === 'image') {
+            if (lien.endsWith(".mp4")) {
+                await ovl.sendMessage(ms_org, {
+                    video: { url: lien },
+                    caption: menu, 
+                    gifPlayback: true,
+                }, { quoted: cmd_options.ms });
+            } else  {
                 await ovl.sendMessage(ms_org, {
                     image: { url: lien },
                     caption: menu
                 }, { quoted: cmd_options.ms });
-            } else {
-                await ovl.sendMessage(ms_org, {
-                    video: { url: lien, gifPlayback: true },
-                    caption: menu
-                }, { quoted: cmd_options.ms });
-            }
+            } 
 
         } catch (error) {
             console.error("Erreur lors de la génération du menu :", error.message || error);
