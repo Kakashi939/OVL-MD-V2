@@ -628,7 +628,7 @@ ovlcmd(
       return ovl.sendMessage(jid, { text: "Veuillez répondre au message à épingler." }, { quoted: ms });
     }
       const key = {
-        remoteJid: ms_org,
+        remoteJid: jid,
         fromMe: auteur_Msg_Repondu === id_Bot,
         id: ms.message.extendedTextMessage.contextInfo.stanzaId,
         participant: auteur_Msg_Repondu,
