@@ -603,7 +603,7 @@ ovlcmd(
     desc: "Epingle des messages",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms, arg, auteur_Message, dev_id, msg_Repondu } = cmd_options;
+    const { verif_Groupe, verif_Admin, repondre, auteur_Msg_Repondu, verif_Ovl_Admin, ms, arg, auteur_Message, dev_id, msg_Repondu } = cmd_options;
       
     if (verif_Groupe) {
       if (!verif_Admin) return repondre("Vous devez être administrateur pour épinglé un message dans le groupe.");
