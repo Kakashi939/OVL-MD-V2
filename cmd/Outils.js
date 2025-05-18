@@ -112,7 +112,7 @@ ovlcmd(
         themesData.forEach((theme, i) => {
           msg += `${i + 1}. ${theme.nom}\n`;
         });
-        return await ovl.sendMessage(ms_org, { text: msg }, { quoted: cmd_options.ms });
+        return await ovl.sendMessage(ms_org, { image: {url: 'https://files.catbox.moe/6xlk10.jpg'}, caption: msg }, { quoted: cmd_options.ms });
       }
 
       const numero = parseInt(args[0], 10);
