@@ -27,19 +27,20 @@ ovlcmd(
             if (!selectedTheme) throw new Error("Thème introuvable dans le fichier JSON");
 
             const lien = selectedTheme.theme[Math.floor(Math.random() * selectedTheme.theme.length)];
-            const mess = `🌐 Bienvenue sur *OVL-MD-V2*, votre bot WhatsApp multi-device.🔍 Tapez *${config.PREFIXE}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD-V2 By *AINZ*`;
+            const menu = `🌐 Bienvenue sur *OVL-MD-V2*, votre bot WhatsApp multi-device.🔍 Tapez *${config.PREFIXE}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD-V2 By *AINZ*`;
 
-            if (choix === 'image') {
-                await ovl.sendMessage(ms_org, { 
-                    image: { url: lien }, 
-                    caption: mess 
+            if (lien.endsWith(".mp4")) {
+                await ovl.sendMessage(ms_org, {
+                    video: { url: lien },
+                    caption: menu, 
+                    gifPlayback: true,
                 }, { quoted: cmd_options.ms });
-            } else {
-                await ovl.sendMessage(ms_org, { 
-                    video: { url: lien, gifPlayback: true }, 
-                    caption: mess 
+            } else  {
+                await ovl.sendMessage(ms_org, {
+                    image: { url: lien },
+                    caption: menu
                 }, { quoted: cmd_options.ms });
-            }
+            } 
 
         } catch (error) {
             console.error("Erreur lors de l'envoi du message de test :", error.message || error);
@@ -168,12 +169,13 @@ ovlcmd(
             const lien = selectedTheme.theme[Math.floor(Math.random() * selectedTheme.theme.length)];
 
             const commandes = cmd;
-            let menu = `╭───❏ 🄾🅅🄻 🄼🄳 ❏
-│ ✿ Prefixe => ${config.PREFIXE}
-│ ✿ Owner => ${config.NOM_OWNER}
-│ ✿ Commandes => ${commandes.length}
-│ ✿ Uptime => ${uptime.trim()}
-│ ✿ Développeur => AINZ
+            let menu = `╔═══ ✥.🄾🅅🄻 🄼🄳.✥ ═══╗
+║ ߷ Prefixe ➽ ${config.PREFIXE}
+║ ߷ Owner ➽ ${config.NOM_OWNER}
+║ ߷ Commandes ➽ ${commandes.length}
+║ ߷ Uptime ➽ ${uptime.trim()}
+║ ߷ Développeur ➽ AINZ
+║ ߷ Version ➽ 2.0.0
 ╰══════════════⊷\n\n`;
 
             const cmd_classe = {};
@@ -189,11 +191,11 @@ ovlcmd(
             }
 
             for (const [classe, cmds] of Object.entries(cmd_classe)) {
-                menu += `╭───❏ ${classe} ❏\n`;
+                menu += `╔═══۞ ${classe} ۞═══╗\n`;
                 cmds.forEach((cmd) => {
-                    menu += `│☞ ${cmd.nom_cmd}\n`;
+                    menu += `│║ ↂ ${cmd.nom_cmd}\n`;
                 });
-                menu += `╰═══════════════⊷\n\n`;
+                menu += `╚════════════════⊷\n\n`;
             }
 
             menu += "> ©2025 OVL-MD-V2 WA-BOT";
