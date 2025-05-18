@@ -597,56 +597,6 @@ ovlcmd(
 
 ovlcmd(
   {
-    nom_cmd: "pin",
-    classe: "Groupe",
-    react: "✅",
-    desc: "Epingle des messages",
-  },
-  async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, repondre, id_Bot, auteur_Msg_Repondu, verif_Ovl_Admin, ms, arg, auteur_Message, dev_id, msg_Repondu } = cmd_options;
-      
-    if (verif_Groupe) {
-      if (!verif_Admin) return repondre("Vous devez être administrateur pour épinglé un message dans le groupe.");
-      if (!verif_Ovl_Admin) return repondre("Je dois être administrateur pour effectuer cette action.");
-    } else {
-      if (!(dev_id || auteur_Message === id_Bot)) return repondre("Cette commande ne peut être utilisée ici que par un développeur ou pour ses propres messages.");
-    }
-    const durations = {
-      "1": 86400,    // 24h
-      "2": 604800,   // 7 jours
-      "3": 2592000   // 30 jours
-    };
-
-    const choix = arg[0];
-
-    if (!choix || !["1", "2", "3"].includes(choix)) {
-      const msg = `📌 *Épingler un message*\n\nChoisissez une durée pour épingler le message cité :\n\n1️⃣ - 24h\n2️⃣ - 7 jours\n3️⃣ - 30 jours\n\nExemple : *pin 1* pour épingler pendant 24h.`;
-      return ovl.sendMessage(jid, { text: msg }, { quoted: ms });
-    }
-      
-    if (!msg_Repondu) {
-      return ovl.sendMessage(jid, { text: "Veuillez répondre au message à épingler." }, { quoted: ms });
-    }
-      const key = {
-        remoteJid: jid,
-        fromMe: auteur_Msg_Repondu === id_Bot,
-        id: ms.message.extendedTextMessage.contextInfo.stanzaId,
-        participant: auteur_Msg_Repondu,
-      };
-    await ovl.groupSettingUpdate(jid, {
-      pin: {
-        type: 1,
-        time: durations[choix],
-        key: key
-      }
-    });
-
-    return ovl.sendMessage(jid, { text: `📌 Message épinglé pour ${choix === "1" ? "24h" : choix === "2" ? "7 jours" : "30 jours"} avec succès.` }, { quoted: ms });
-  }
-);
-
-ovlcmd(
-  {
     nom_cmd: "close",
     classe: "Groupe",
     react: "✅",
