@@ -193,7 +193,7 @@ ovlcmd(
             for (const [classe, cmds] of Object.entries(cmd_classe)) {
                 menu += `╔═══۞ ${classe} ۞═══╗\n`;
                 cmds.forEach((cmd) => {
-                    menu += `│║ ↂ ${cmd.nom_cmd}\n`;
+                    menu += `║ ↂ ${cmd.nom_cmd}\n`;
                 });
                 menu += `╚════════════════⊷\n\n`;
             }
