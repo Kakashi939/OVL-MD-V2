@@ -35,7 +35,7 @@ async function connection_update(con, ovl, main) {
 ߷ Mode ➽ ${config.MODE}
 ߷ cmds ➽ ${evt.cmd.length}
 ߷ Version ➽ 2.0.0
-߷ Développeur ➽  Ainz`;
+߷ Développeur ➽ Ainz`;
 
         if (ovl.user && ovl.user.id) {
             await ovl.sendMessage(ovl.user.id, { text: start_msg });
