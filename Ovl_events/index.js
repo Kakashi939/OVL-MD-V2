@@ -1,5 +1,5 @@
 const { dl_save_media_ms, recup_msg } = require('./autres_fonctions');
-const { updateContacts, getUserName, contactCache } = require('./autres_fonctions');
+const { updateContacts, getUserName, contactCache } = require('./contact_upstair');
 
 module.exports = {
   message_upsert: require('./message_upsert'),
