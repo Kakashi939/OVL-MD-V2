@@ -16,7 +16,7 @@ const {
 
 const config = require("./set");
 const session = config.SESSION_ID || "";
-const { message_upsert, group_participants_update, connection_update, dl_save_media_ms, recup_msg } = require('./Ovl_events');
+const { message_upsert, group_participants_update, connection_update, dl_save_media_ms, recup_msg, updateContacts } = require('./Ovl_events');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -59,6 +59,7 @@ async function main() {
         // Liaison des événements
         ovl.ev.on("messages.upsert", async (m) => { message_upsert(m, ovl); });
         ovl.ev.on('group-participants.update', async (data) => { group_participants_update(data, ovl); });
+        ovl.ev.on('contacts.upsert', updateContacts);
         ovl.ev.on("connection.update", async (con) => { connection_update(con, ovl, main); });
         ovl.ev.on("creds.update", saveCreds);
 
