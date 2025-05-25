@@ -16,7 +16,7 @@ const {
 
 const config = require("./set");
 const session = config.SESSION_ID || "";
-const { message_upsert, group_participants_update, connection_update, dl_save_media_ms, recup_msg, updateContacts } = require('./Ovl_events');
+const { message_upsert, group_participants_update, connection_update, dl_save_media_ms } = require('./Ovl_events');
 
 const app = express();
 const port = process.env.PORT || 3000;
