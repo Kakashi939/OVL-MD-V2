@@ -9,7 +9,6 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { readFileSync } = require('fs');
 const sharp = require('sharp');
-const getUserName = require('../Ovl_events/contact_upsert');
 
 async function uploadToCatbox(filePath) {
   try {
@@ -809,12 +808,7 @@ ovlcmd(
       pfp = "https://files.catbox.moe/8kvevz.jpg";
     }
 
-    let tname;
-    try {
-      tname = getUserName(auteur_Msg_Repondu) || "OVL-MD-USER";
-    } catch (e) {
-      tname = "OVL-MD-USER";
-    }
+    let tname = "OVL-MD-USER";
 
     const couleurs = ["#FFFFFF", "#000000", "#1f1f1f", "#e3e3e3"];
     const backgroundColor = couleurs[Math.floor(Math.random() * couleurs.length)];
