@@ -865,3 +865,73 @@ ovlcmd(
     }
   }
 );
+
+ovlcmd(
+    {
+        nom_cmd: "tovv",
+        classe: "Outils",
+        react: "👀",
+        desc: "envoie un message en vue unique dans la discussion",
+    },
+    async (ms_org, ovl, cmd_options) => {
+        const { ms, msg_Repondu, repondre } = cmd_options;
+
+        if (!msg_Repondu) {
+            return repondre("Veuillez mentionner un message qui n'est pas en vue unique.");
+        }
+
+        let viewOnceKey = Object.keys(msg_Repondu).find(key => key.startsWith("viewOnceMessage"));
+        let vue_Unique_Message = msg_Repondu;
+
+        if (viewOnceKey) {
+            vue_Unique_Message = msg_Repondu[viewOnceKey].message;
+        }
+
+        if (vue_Unique_Message) {
+            if (
+                (vue_Unique_Message.imageMessage && vue_Unique_Message.imageMessage.viewOnce == true) ||
+                (vue_Unique_Message.videoMessage && vue_Unique_Message.videoMessage.viewOnce == true) ||
+                (vue_Unique_Message.audioMessage && vue_Unique_Message.audioMessage.viewOnce == true)
+            ) {
+                return repondre("Ce message est un message en vue unique.");
+            }
+        }
+
+        try {
+            let media;
+            let options = { quoted: ms };
+
+            if (vue_Unique_Message.imageMessage) {
+                media = await ovl.dl_save_media_ms(vue_Unique_Message.imageMessage);
+                await ovl.sendMessage(
+                    ms_org,
+                    { image: { url: media }, viewOnce: true, caption: vue_Unique_Message.imageMessage.caption || "" },
+                    options
+                );
+
+            } else if (vue_Unique_Message.videoMessage) {
+                media = await ovl.dl_save_media_ms(vue_Unique_Message.videoMessage);
+                await ovl.sendMessage(
+                    ms_org,
+                    { video: { url: media }, viewOnce: true, caption: vue_Unique_Message.videoMessage.caption || "" },
+                    options
+                );
+
+            } else if (vue_Unique_Message.audioMessage) {
+                media = await ovl.dl_save_media_ms(vue_Unique_Message.audioMessage);
+                await ovl.sendMessage(
+                    ms_org,
+                    { audio: { url: media }, viewOnce: true, mimetype: "audio/mp4", ptt: false },
+                    options
+                );
+
+            } else {
+                return repondre("Ce type de message en vue unique n'est pas pris en charge.");
+            }
+        } catch (_error) {
+            console.error("Erreur lors de l'envoi du message en vue unique :", _error.message || _error);
+            return repondre("Une erreur est survenue lors du traitement du message.");
+        }
+    }
+);
+
