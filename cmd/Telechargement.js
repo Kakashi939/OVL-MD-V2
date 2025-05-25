@@ -6,46 +6,39 @@ const { search, download } = require("aptoide_scrapper_fixed");
 const fs = require("fs");
 const path = require("path");
 
-const tmp = path.join(__dirname, "../temp");
-if (!fs.existsSync(tmp)) fs.mkdirSync(tmp);
-
 async function sendMedia(ms_org, ovl, url, format, type, ms) {
   try {
-    const downloadLink = await axios.get(`https://glad-atlanta-ovl-9417f8d8.koyeb.app/ovl-yt-dl?url=${url}&format=${format}`);
+    const res = await axios.get(`https://api.ownblox.my.id/api/ytdl?url=${url}&type=${format}`);
     
-    if (!downloadLink.data.url) {
+    if (!res.data || !res.data.result) {
+      throw new Error("Résultat invalide depuis l'API.");
+    }
+
+    let dl_link;
+    if (format === "mp3") {
+      dl_link = res.data.result.audio_download;
+    } else {
+      dl_link = res.data.result.video_download;
+    }
+
+    if (!dl_link) {
       throw new Error("Le lien de téléchargement est introuvable.");
     }
 
-    const fileName = `media_${Date.now()}.${format === "weba" ? "mp3" : "mp4"}`;
-    const filePath = path.join(tmp, fileName);
- 
-    const response = await axios({
-      method: 'GET',
-      url: downloadLink.data.url,
-      responseType: 'stream'
-    });
+    const fileRes = await axios.get(dl_link, { responseType: 'arraybuffer' });
+    const buff = Buffer.from(fileRes.data);
 
-    const writer = fs.createWriteStream(filePath);
-    response.data.pipe(writer);
-
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
- 
     const message = {
-      [type]: { url: filePath },
-      mimetype: format === "weba" ? "audio/mpeg" : "video/mp4",
-      caption: `\`\`\`Powered By OVL-MD\`\`\``
+      [type]: buff,
+      mimetype: format === "mp3" ? "audio/mpeg" : "video/mp4",
+      caption: "```Powered By OVL-MD```"
     };
 
     await ovl.sendMessage(ms_org, message, { quoted: ms });
- 
-    fs.unlinkSync(filePath);
+
   } catch (error) {
     console.error("Erreur lors de l'envoi du média:", error.message);
-    throw error;
+    await ovl.sendMessage(ms_org, { text: "❌ Une erreur s'est produite lors du traitement du média." }, { quoted: ms });
   }
 }
 
@@ -85,7 +78,7 @@ ovlcmd(
 
             await ovl.sendMessage(ms_org, { image: { url: videoInfo.thumbnail }, caption }, { quoted: ms });
 
-            await sendMedia(ms_org, ovl, videoInfo.url, "weba", "audio", ms);
+            await sendMedia(ms_org, ovl, videoInfo.url, "mp3", "audio", ms);
         } catch (error) {
             console.error("Erreur Song Downloader:", error.message);
             await ovl.sendMessage(ms_org, { text: "Erreur lors du téléchargement." }, { quoted: ms });
@@ -159,7 +152,7 @@ ovlcmd(
     }
 
     try {
-      await sendMedia(ms_org, ovl, videoLink, "weba", "audio", ms);
+      await sendMedia(ms_org, ovl, videoLink, "mp3", "audio", ms);
     } catch (error) {
       ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
     }
