@@ -224,41 +224,6 @@ ovlcmd(
 
 ovlcmd(
     {
-        nom_cmd: "deepseek",
-        classe: "IA",
-        react: "🤖",
-        desc: "Utilise l'API Deepseek pour générer des réponses."
-    },
-    async (ms_org, ovl, cmd_options) => {
-        const { arg, ms } = cmd_options;
-
-        // Vérification si l'utilisateur a fourni un prompt
-        if (!arg.length) {
-            return ovl.sendMessage(ms_org, { text: "Veuillez entrer un prompt pour générer une réponse." }, { quoted: ms });
-        }
-
-        const prompt = arg.join(" ");
-        const apiUrl = `https://api.ryzumi.vip/api/ai/deepseek?text=${encodeURIComponent(prompt)}`;
-
-        try {
-            // Appel à l'API pour obtenir la réponse
-            const result = await axios.get(apiUrl);
-
-            if (result.data && result.data.answer) {
-                const responseText = result.data.answer;
-                return ovl.sendMessage(ms_org, { text: responseText }, { quoted: ms });
-            } else {
-                return ovl.sendMessage(ms_org, { text: "Erreur de réponse de l'API." }, { quoted: ms });
-            }
-        } catch (error) {
-            console.error("Erreur lors de l'appel à l'API :", error);
-            return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'appel à l'API." }, { quoted: ms });
-        }
-    }
-);
-
-ovlcmd(
-    {
         nom_cmd: "gemini",
         classe: "IA",
         react: "🤖",
@@ -273,7 +238,7 @@ ovlcmd(
         }
 
         const prompt = arg.join(" ");
-        const apiUrl = `https://api.ryzumi.vip/api/ai/gemini?text=${encodeURIComponent(prompt)}`;
+        const apiUrl = `https://bk9.fun/ai/gemini?q=${encodeURIComponent(prompt)}`;
 
         try {
             // Appel à l'API pour obtenir la réponse
