@@ -9,6 +9,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { readFileSync } = require('fs');
 const sharp = require('sharp');
+const getUserName = require('../Ovl_events/contact_upsert');
 
 async function uploadToCatbox(filePath) {
   try {
@@ -785,6 +786,82 @@ ovlcmd(
       repondre("Erreur lors de l'envoi du GIF.");
     } finally {
       fs.unlinkSync(cheminFichier);
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "quotely",
+    classe: "Conversion",
+    react: "🖼️",
+    desc: "Transforme un message cité en sticker stylisé.",
+    alias: ["q"]
+  },
+  async (ms_org, ovl, { ms, msg_Repondu, repondre, auteur_Msg_Repondu }) => {
+    const text = msg_Repondu?.conversation || msg_Repondu?.extendedTextMessage?.text;
+    if (!text) return repondre('Veuillez répondre à un message texte.');
+
+    let pfp;
+    try {
+      pfp = await ovl.profilePictureUrl(auteur_Msg_Repondu, "image");
+    } catch (e) {
+      pfp = "https://files.catbox.moe/8kvevz.jpg";
+    }
+
+    let tname;
+    try {
+      tname = getUserName(auteur_Msg_Repondu) || "OVL-MD-USER";
+    } catch (e) {
+      tname = "OVL-MD-USER";
+    }
+
+    const couleurs = ["#FFFFFF", "#000000", "#1f1f1f", "#e3e3e3"];
+    const backgroundColor = couleurs[Math.floor(Math.random() * couleurs.length)];
+
+    const body = {
+      type: "quote",
+      format: "png",
+      backgroundColor,
+      width: 512,
+      height: 512,
+      scale: 3,
+      messages: [{
+        avatar: true,
+        from: {
+          first_name: tname,
+          language_code: "fr",
+          name: tname,
+          photo: { url: pfp }
+        },
+        text,
+        replyMessage: {},
+      }],
+    };
+
+    try {
+      const res = await axios.post("https://bot.lyo.su/quote/generate", body);
+      const img = Buffer.from(res.data.result.image, "base64");
+
+      const sticker = new Sticker(img, {
+        pack: config.STICKER_PACK_NAME,
+        author: config.STICKER_AUTHOR_NAME,
+        type: StickerTypes.FULL,
+        quality: 100,
+      });
+
+      const stickerFileName = `/tmp/quotely_${Date.now()}.webp`;
+      await sticker.toFile(stickerFileName);
+
+      await ovl.sendMessage(ms_org, {
+        sticker: fs.readFileSync(stickerFileName)
+      }, { quoted: ms });
+
+      fs.unlinkSync(stickerFileName);
+
+    } catch (err) {
+      console.error("Erreur Quotely :", err.message || err);
+      return repondre("Une erreur est survenue lors de la génération du sticker.");
     }
   }
 );
