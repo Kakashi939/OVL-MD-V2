@@ -1,5 +1,5 @@
-const { ovlcmd } = require("../framework/ovlcmd");
-const { fbdl, ttdl, igdl, twitterdl, ytdl } = require("../framework/dl");
+const { ovlcmd } = require("../lib/ovlcmd");
+const { fbdl, ttdl, igdl, twitterdl, ytdl } = require("../lib/dl");
 const ytsr = require('@distube/ytsr');
 const axios = require('axios');
 const { search, download } = require("aptoide_scrapper_fixed");
