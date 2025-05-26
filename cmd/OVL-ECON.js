@@ -175,11 +175,11 @@ ovlcmd(
     react: "📦",
     desc: "Augmenter la capacite de la banque"
   },
-  async (ms_org, ovl, { arg, auteur, repondre }) => {
+  async (ms_org, ovl, { arg, auteur_Message, repondre }) => {
     const niveau = parseInt(arg[0]);
 
     if (!niveau || !prixCapacite[niveau]) {
-      return repondre("❌ Veuillez choisir un niveau entre 1 et 5.");
+      return repondre("Veuillez choisir un niveau entre 1 et 5.");
     }
 
     const utilisateur = await getInfosUtilisateur(auteur);
@@ -191,7 +191,7 @@ ovlcmd(
       return repondre(`💸 Fonds insuffisants. Il faut ${montant} 🪙 dans le portefeuille.`);
     }
 
-    await modifierSolde(auteur, { portefeuille: -montant, capacite_banque: capacite }, true);
+    await modifierSolde(auteur_Message, { portefeuille: -montant, capacite_banque: capacite }, true);
 
     repondre(
       `✅ *Capacité améliorée au niveau ${niveau}*
@@ -230,6 +230,43 @@ ovlcmd(
       `🏦 *Dépôt effectué avec succès !*
 💰 *Montant déposé :* ${montant} 🪙
 📦 *Banque actuelle :* ${banque + montant} / ${capacite_banque} 🪙`
+    );
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "retrait",
+    react: "💼",
+    desc: "Transférer des fonds de la banque vers le portefeuille"
+  },
+  async (ms_org, ovl, { arg, auteur_Message, repondre }) => {
+    const montant = parseInt(arg[0]);
+    if (!montant || montant <= 0) {
+      return repondre("Veuillez entrer un montant valide à retirer.");
+    }
+
+    const utilisateur = await getInfosUtilisateur(auteur_Message);
+    const { portefeuille, banque } = utilisateur;
+
+    if (banque < montant) {
+      return repondre("Fonds insuffisants dans la banque.");
+    }
+
+    const montantFinal = Math.floor(montant * 0.99);
+    const frais = montant - montantFinal;
+
+    await modifierSolde(auteur_Message, {
+      banque: -montant,
+      portefeuille: montantFinal
+    }, true);
+
+    repondre(
+      `💼 *Retrait effectué avec succès !*
+💰 *Montant demandé :* ${montant} 🪙
+📉 *Frais (1%) :* ${frais} 🪙
+💵 *Montant reçu :* ${montantFinal} 🪙
+👛 *Portefeuille actuel :* ${portefeuille + montantFinal} 🪙`
     );
   }
 );
