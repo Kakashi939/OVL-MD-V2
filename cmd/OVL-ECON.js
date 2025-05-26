@@ -271,3 +271,111 @@ ovlcmd(
   }
 );
 
+ovlcmd(
+  {
+    nom_cmd: "vol",
+    desc: "Tenter de voler un autre utilisateur",
+    react: "🕶️",
+    classe: "Economie"
+  },
+  async (ms_org, ovl, { repondre, auteur_Message, arg }) => {
+    const victimeId = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
+
+    if (!victimeId) return repondre("Mentionne un utilisateur valide à voler.");
+
+    if (victimeId === auteur_Message) return repondre("Tu ne peux pas te voler toi-même, voleur paresseux 😒.");
+
+    const voleur = await getInfosUtilisateur(auteur_Message);
+    const victime = await getInfosUtilisateur(victimeId);
+
+    if (!voleur || !victime) return repondre("Impossible de trouver les profils des utilisateurs.");
+
+    if (voleur.portefeuille < 1000)
+      return repondre("💸 Tu dois avoir au moins 1000 🪙 pour tenter un vol (au cas où tu te fais attraper).");
+
+    if (victime.portefeuille < 1000)
+      return repondre("🤷🏽‍♂️ Ta victime est trop pauvre... Trouve-toi une meilleure cible.");
+
+    const scenarios = ["echoue", "reussi", "attrape"];
+    const resultat = scenarios[Math.floor(Math.random() * scenarios.length)];
+
+    switch (resultat) {
+      case "echoue":
+        return repondre("😬 Ta victime s'est échappée ! Sois plus intimidant la prochaine fois.");
+
+      case "reussi": {
+        const montantVole = Math.floor(Math.random() * 1000) + 100;
+        await modifierSolde(victimeId, "portefeuille", -montantVole);
+        await modifierSolde(auteur_Message, "portefeuille", montantVole);
+        return repondre(`🤑 Vol réussi ! Tu as volé *${montantVole} 🪙* à ta victime.`);
+      }
+
+      case "attrape": {
+        const amende = Math.floor(Math.random() * 1000) + 100;
+        await modifierSolde(auteur_Message, "portefeuille", -amende);
+        return repondre(`🚓 Oups ! Tu t'es fait attraper par la police. Amende : *${amende} 🪙*.`);
+      }
+
+      default:
+        return repondre("Une erreur est survenue. Essaie encore.");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "pari",
+    desc: "Parier de l'argent en devinant une direction",
+    react: "🎲",
+    classe: "Economie"
+  },
+  async (ms_org, ovl, { repondre, auteur_Message, arg }) => {
+    const montant = parseInt(arg[0]);
+    const direction = arg[1]?.toLowerCase();
+
+    const directionsFr = ["haut", "bas", "gauche", "droite"];
+
+    if (!montant || montant < 50) {
+      return repondre("❌ Tu dois miser au moins 50 🪙.");
+    }
+
+    if (!direction || !directionsFr.includes(direction)) {
+      return repondre("🧭 Choisis une direction valide : *haut, bas, gauche ou droite*.\nExemple : `pari 200 gauche`");
+    }
+
+    const joueur = await getInfosUtilisateur(auteur_Message);
+    if (joueur.portefeuille < montant) {
+      return repondre("💸 Fonds insuffisants dans ton portefeuille.");
+    }
+
+    // Mapping pour passer des noms FR aux URLs (basé sur l'ancien code)
+    const mapDirections = {
+      haut: "up",
+      bas: "down",
+      gauche: "left",
+      droite: "right"
+    };
+
+    const directionsPossibles = Object.keys(mapDirections);
+    const directionAleatoireFr = directionsPossibles[Math.floor(Math.random() * directionsPossibles.length)];
+    const directionAleatoire = mapDirections[directionAleatoireFr];
+
+    const imagesDirection = {
+      haut: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/upr.webp?raw=true",
+      bas: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/downr.webp?raw=true",
+      gauche: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/leftr.webp?raw=true",
+      droite: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/rightr.webp?raw=true"
+    };
+
+    await ovl.sendImage(ms_org, imagesDirection[direction], "", ms_org);
+
+    if (direction === directionAleatoireFr) {
+      const gain = montant * 2;
+      await modifierSolde(auteur_Message, "portefeuille", gain);
+      return repondre(`🎉 *Bravo !* La direction était *${directionAleatoireFr}*.\n✅ Tu gagnes *${gain} 🪙* !`);
+    } else {
+      await modifierSolde(auteur_Message, "portefeuille", -montant);
+      return repondre(`😓 *Raté !* La direction correcte était *${directionAleatoireFr}*.\n❌ Tu perds *${montant} 🪙*.`);
+    }
+  }
+);
