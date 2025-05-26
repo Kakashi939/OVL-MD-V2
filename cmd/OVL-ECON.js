@@ -13,7 +13,7 @@ function generateTransactionId() {
 
 ovlcmd(
   {
-    nom_cmd: "myovl_econ",
+    nom_cmd: "myecon",
     desc: "Afficher votre portefeuille et banque",
     react: "💰",
     classe: "OVL-ECON--y"
@@ -41,13 +41,13 @@ ovlcmd(
       const capacite = data.capacite_banque ?? 10000;
       const identifiantStable = generateUserId(userId);
 
-      const message = `╭───────🎒 *OVL-ECON--Y* 🎒───────╮
+      const message = `╭────🎒 *OVL-ECON--Y* 🎒────╮
 ┃ 👤 *Pseudo :* ${pseudo}
 ┃ 🆔 *Identifiant :* ${identifiantStable}
 ┃ 💼 *Portefeuille :* ${wallet} 💸
 ┃ 🏦 *Banque :* ${banque} 🪙
 ┃ 📈 *Capacité Banque :* ${capacite} 🧱
-╰───────────────────────────╯`;
+╰─────────────────────╯`;
 
       await ovl.sendMessage(
   ms_org,
@@ -119,7 +119,7 @@ ovlcmd(
 ┃ 📉 *Frais (1%) :* ${montant - montantRecu} 🪙
 ┃ 📥 *Montant reçu :* ${montantRecu} 🪙
 ┃ 📅 *Date :* ${new Date().toLocaleString()}
-╰──────────────────────────────╯`;
+╰─────────────────────────╯`;
 
       return repondre(recu);
     } catch (error) {
@@ -363,7 +363,7 @@ ovlcmd(
     }
       
     const directionAleatoireFr = directionsFr[Math.floor(Math.random() * directionsFr.length)];
-    const directionAleatoire = mapDirections[directionAleatoireFr];
+    const directionAleatoire = directionsFr[directionAleatoireFr];
 
     const imagesDirection = {
       haut: "https://files.catbox.moe/j0wmsd.jpg",
