@@ -343,7 +343,7 @@ ovlcmd(
     react: "🎲",
     classe: "OVL-ECON--y"
   },
-  async (ms_org, ovl, { repondre, auteur_Message, arg }) => {
+  async (ms_org, ovl, { repondre, auteur_Message, arg, ms }) => {
     const montant = parseInt(arg[0]);
     const direction = arg[1]?.toLowerCase();
 
