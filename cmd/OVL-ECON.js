@@ -484,3 +484,70 @@ async (ms_org, ovl, { auteur_Message, repondre, prefixe }) => {
 
   await repondre(`🎰 *Résultat :*\n\n${f1}  ${f2}  ${f3}\n\n${message}\n\n📊 Tu ${signe} *${absVar} 🪙*.`);
 });
+
+ovlcmd(
+  {
+    nom_cmd: "bonus",
+    classe: "OVL-ECON--y",
+    react: "🎁",
+    desc: "Réclame un bonus toutes les 2 heures"
+  },
+  async (ms_org, ovl, { auteur_Message, repondre }) => {
+    const utilisateur = await getInfosUtilisateur(auteur_Message);
+    const maintenant = Date.now();
+    const deuxHeures = 2 * 60 * 60 * 1000;
+
+    if (!utilisateur.last_bonus) {
+      utilisateur.last_bonus = 0;
+    }
+
+    const tempsEcoule = maintenant - utilisateur.last_bonus;
+    if (tempsEcoule < deuxHeures) {
+      const tempsRestant = deuxHeures - tempsEcoule;
+      const minutes = Math.floor(tempsRestant / 60000);
+      const secondes = Math.floor((tempsRestant % 60000) / 1000);
+      return repondre(`⏳ Tu dois attendre encore ${minutes} min ${secondes} sec avant de réclamer ton prochain bonus.`);
+    }
+
+    await modifierSolde(auteur_Message, "portefeuille", 1000);
+    utilisateur.last_bonus = maintenant;
+    await utilisateur.save();
+
+    repondre("🎉 Tu as reçu *1000 pièces* ! Reviens dans 2h pour un autre bonus.");
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "don",
+    classe: "OVL-ECON--y",
+    react: "🤝",
+    desc: "Permet à un Premium de donner des pièces à un autre utilisateur"
+  },
+  async (ms_org, ovl, { arg, auteur_Message, repondre, prenium_id, dev_id }) => {
+    const utilisateur = await getInfosUtilisateur(auteur_Message);
+    if (!prenium_id) {
+      return repondre("Cette commande est réservée aux utilisateurs Premium.");
+    }
+
+    const destinataire = arg[0];
+    if (!destinataire) return repondre("Mentionne la personne à qui tu veux donner de l'argent.");
+
+    const montant = parseInt(arg[1]);
+    if (!montant || montant <= 0) return repondre("Montant invalide.");
+
+    const limite = 50000;
+    if (montant > limite && !dev_id) {
+      return repondre(`Tu ne peux pas donner plus de *${limite} pièces*.`);
+    }
+
+    const destinataireExiste = await ECONOMIE.findOne({ where: { id: destinataire } });
+    if (!destinataireExiste) {
+      return repondre("L'utilisateur mentionné n'est pas enregistré dans le système.");
+    }
+
+    await modifierSolde(destinataire, "portefeuille", montant);
+
+    repondre(`✅ Tu as donné *${montant} pièces* à @${destinataire.split("@")[0]} 💸`);
+  }
+);
