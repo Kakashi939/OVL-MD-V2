@@ -49,8 +49,11 @@ ovlcmd(
 ┃ 📈 *Capacité Banque :* ${capacite} 🧱
 ╰───────────────────────────╯`;
 
-      await repondre({ image: { url: pp }, caption: message });
-
+      await ovl.sendMessage(
+  ms_org,
+  { image: { url: pp }, caption: message },
+  { quoted: ms }
+);
     } catch (err) {
       console.error("Erreur dans myovl_econ:", err);
       await repondre("❌ Une erreur est survenue lors de la récupération des informations économiques.");
