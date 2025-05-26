@@ -1,5 +1,5 @@
 const { ovlcmd } = require("../lib/ovlcmd");
-const { modifierSolde, getInfosUtilisateur, resetEconomie, mettreAJourCapaciteBanque } = require("../DataBase/economie");
+const { modifierSolde, getInfosUtilisateur, resetEconomie, mettreAJourCapaciteBanque, ECONOMIE } = require("../DataBase/economie");
 const crypto = require("crypto");
 
 function generateUserId(jid) {
@@ -530,7 +530,7 @@ ovlcmd(
       return repondre("Cette commande est réservée aux utilisateurs Premium.");
     }
 
-    const destinataire = arg[0];
+    const destinataire = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!destinataire) return repondre("Mentionne la personne à qui tu veux donner de l'argent.");
 
     const montant = parseInt(arg[1]);
