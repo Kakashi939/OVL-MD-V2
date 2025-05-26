@@ -45,6 +45,10 @@ const ECONOMIE = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 10000,
     },
+    last_bonus: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   },
   {
     tableName: "economie",
@@ -65,6 +69,7 @@ async function ajouterUtilisateur(jid, pseudo = "Utilisateur") {
       portefeuille: 0,
       banque: 0,
       capacite_banque: 1000,
+      last_bonus: 0,
     },
   });
 }
