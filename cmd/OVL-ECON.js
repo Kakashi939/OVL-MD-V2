@@ -336,7 +336,7 @@ ovlcmd(
     const directionsFr = ["haut", "bas", "gauche", "droite"];
 
     if (!montant || montant < 50) {
-      return repondre("❌ Tu dois miser au moins 50 🪙.");
+      return repondre("Tu dois miser au moins 50 🪙.");
     }
 
     if (!direction || !directionsFr.includes(direction)) {
@@ -347,27 +347,21 @@ ovlcmd(
     if (joueur.portefeuille < montant) {
       return repondre("💸 Fonds insuffisants dans ton portefeuille.");
     }
-
-    // Mapping pour passer des noms FR aux URLs (basé sur l'ancien code)
-    const mapDirections = {
-      haut: "up",
-      bas: "down",
-      gauche: "left",
-      droite: "right"
-    };
-
-    const directionsPossibles = Object.keys(mapDirections);
-    const directionAleatoireFr = directionsPossibles[Math.floor(Math.random() * directionsPossibles.length)];
+      
+    const directionAleatoireFr = directionsFr[Math.floor(Math.random() * directionsFr.length)];
     const directionAleatoire = mapDirections[directionAleatoireFr];
 
     const imagesDirection = {
-      haut: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/upr.webp?raw=true",
-      bas: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/downr.webp?raw=true",
-      gauche: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/leftr.webp?raw=true",
-      droite: "https://github.com/SecktorBot/Brandimages/blob/main/Nezuko/rightr.webp?raw=true"
+      haut: "https://files.catbox.moe/j0wmsd.jpg",
+      bas: "https://files.catbox.moe/qizuxk.jpg",
+      gauche: "https://files.catbox.moe/lj7xmc.jpg",
+      droite: "https://files.catbox.moe/dsfbhl.jpg"
     };
 
-    await ovl.sendImage(ms_org, imagesDirection[direction], "", ms_org);
+    await ovl.sendMessage(ms_org, {
+      image: { url: imagesDirection[direction] },
+      caption: '',
+    }, { quoted: ms });
 
     if (direction === directionAleatoireFr) {
       const gain = montant * 2;
