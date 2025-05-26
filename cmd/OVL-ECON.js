@@ -141,7 +141,8 @@ ovlcmd(
 
     if (!cible) {
       repondre("Veuillez mentionner un utilisateur ou répondre à son message.");
-
+        
+    }
     const utilisateur = await resetEconomie(cible, {
       wallet: true,
       banque: true,
