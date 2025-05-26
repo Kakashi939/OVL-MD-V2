@@ -1,5 +1,5 @@
 const { ovlcmd } = require("../lib/ovlcmd");
-const { modifierSolde, getInfosUtilisateur, resetEconomie, mettreAJourCapaciteBanque, ECONOMIE } = require("../DataBase/economie");
+const { modifierSolde, getInfosUtilisateur, resetEconomie, mettreAJourCapaciteBanque, ECONOMIE, TopBanque } = require("../DataBase/economie");
 const crypto = require("crypto");
 
 function generateUserId(jid) {
