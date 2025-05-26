@@ -44,7 +44,7 @@ const ECONOMIE = sequelize.define(
     },
     capacite_banque: {
       type: DataTypes.INTEGER,
-      defaultValue: 1000,
+      defaultValue: 10000,
     },
   },
   {
@@ -124,7 +124,7 @@ async function resetEconomie(jid, options = { wallet: false, banque: false, capa
 
   if (options.wallet) utilisateur.portefeuille = 0;
   if (options.banque) utilisateur.banque = 0;
-  if (options.capacite) utilisateur.capacite_banque = 1000;
+  if (options.capacite) utilisateur.capacite_banque = 10000;
 
   await utilisateur.save();
   return utilisateur.dataValues;
