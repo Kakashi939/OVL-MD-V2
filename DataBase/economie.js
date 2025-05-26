@@ -133,7 +133,28 @@ async function resetEconomie(jid, options = { wallet: false, banque: false, capa
   return utilisateur.dataValues;
 }
 
+async function  TopBanque() {
+  try {
+    const top = await ECONOMIE.findAll({
+      order: [['banque', 'DESC']],
+      limit: 10,
+      attributes: ['id', 'portefeuille', 'banque', 'capacite']
+    });
+
+    return top.map(u => ({
+      id: u.id,
+      portefeuille: u.portefeuille,
+      banque: u.banque,
+      capacite: u.capacite
+    }));
+  } catch (err) {
+    console.error("Erreur lors de la récupération du top banque :", err);
+    return [];
+  }
+}
+
 module.exports = {
+  TopBanque,
   ECONOMIE,
   ajouterUtilisateur,
   supprimerUtilisateur,
