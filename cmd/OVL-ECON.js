@@ -373,3 +373,100 @@ ovlcmd(
     }
   }
 );
+
+ovlcmd(
+  {
+    nom_cmd: "slot",
+    desc: "Jouer à la machine à sous",
+    react: "🎰",
+    classe: "Economie"
+  },
+  async (ms_org, ovl, { auteur_Message, repondre }) => {
+    const { portefeuille } = await getInfosUtilisateur(auteur_Message);
+    if (portefeuille < 100) return repondre("💰 Tu as besoin d'au moins 100 🪙 pour jouer.");
+
+    const emojis = ["🔴", "🔵", "🟣", "🟢", "🟡", "⚪️", "⚫️"];
+    const lignes = Array.from({ length: 3 }, () =>
+      Array.from({ length: 3 }, () => Math.floor(Math.random() * emojis.length))
+    );
+
+    const grille = lignes.map(l => l.map(i => emojis[i]));
+    const afficher = grille.map(l => l.join("   ")).join("\n");
+
+    const match = (a, b, c) => a === b && b === c;
+    const gagne =
+      match(grille[0][0], grille[0][1], grille[0][2]) ||
+      match(grille[1][0], grille[1][1], grille[1][2]) ||
+      match(grille[2][0], grille[2][1], grille[2][2]) ||
+      match(grille[0][0], grille[1][0], grille[2][0]) ||
+      match(grille[0][1], grille[1][1], grille[2][1]) ||
+      match(grille[0][2], grille[1][2], grille[2][2]) ||
+      match(grille[0][0], grille[1][1], grille[2][2]) ||
+      match(grille[0][2], grille[1][1], grille[2][0]);
+
+    if (gagne) {
+      const gain = Math.floor(Math.random() * 5000);
+      await modifierSolde(auteur_Message, "portefeuille", gain * 2);
+      return repondre(`🎰 *Résultat*\n${afficher}\n\n🎉 *Jackpot ! Tu gagnes ${gain * 2} 🪙*`);
+    } else {
+      const perte = Math.floor(Math.random() * 300);
+      await modifierSolde(auteur_Message, "portefeuille", -perte);
+      return repondre(`🎰 *Résultat*\n${afficher}\n\n📉 *Tu perds ${perte} 🪙...*`);
+    }
+  }
+);
+
+ovlcmd({
+  nom_cmd: "slot2",
+  desc: "Joue à la machine à sous spéciale weekend",
+  react: "🎰",
+  classe: "Économie"
+},
+async (ms_org, ovl, { auteur_Message, repondre, prefixe }) => {
+  const jour = new Date().getDay();
+  if (![5, 6, 0].includes(jour)) return repondre("🎮 Tu peux jouer uniquement pendant le weekend : *vendredi, samedi, dimanche*.");
+
+  const { portefeuille } = await getInfosUtilisateur(auteur_Message);
+  const mise = parseInt(ovl.split(" ")[0]) || 100;
+
+  if (mise > portefeuille) return repondre(`💰 Tu n'as que *${portefeuille} 🪙* dans ton portefeuille.`);
+
+  const fruits = ["🥥", "🍎", "🍇", "🍍"];
+  const getFruit = () => fruits[Math.floor(Math.random() * fruits.length)];
+  const f1 = getFruit(), f2 = getFruit(), f3 = getFruit();
+
+  const messages = {
+    jackpot: "*🎊 JACKPOT ! 🎊*\n\n🤑 Tu gagnes *x100* ta mise !",
+    triple: "*🎉 BRAVO !*\n\nTu as eu 3 fruits identiques 🍒🍒🍒 ! Tu gagnes *x3* ta mise.",
+    double: "*😊 Bien joué !*\n\nDeux fruits identiques, tu gagnes *x1.5* ta mise.",
+    perte: "*😓 Perdu !*\n\nAucun fruit identique... Tu perds ta mise."
+  };
+
+  let multiplicateur = 0;
+  let message = "";
+
+  if (f1 === "🍇" && f2 === "🍇" && f3 === "🍇") {
+    multiplicateur = 100;
+    message = messages.jackpot;
+  } else if (f1 === f2 && f2 === f3) {
+    multiplicateur = 3;
+    message = messages.triple;
+  } else if (f1 === f2 || f2 === f3 || f1 === f3) {
+    multiplicateur = 1.5;
+    message = messages.double;
+  } else {
+    multiplicateur = 0;
+    message = messages.perte;
+  }
+
+  const gain = Math.floor(mise * multiplicateur);
+  const variation = gain - mise;
+
+  // Appliquer le gain ou la perte
+  await modifierSolde(auteur_Message, "portefeuille", variation);
+
+  const signe = variation >= 0 ? "gagnes" : "perds";
+  const absVar = Math.abs(variation);
+
+  await repondre(`🎰 *Résultat :*\n\n${f1}  ${f2}  ${f3}\n\n${message}\n\n📊 Tu ${signe} *${absVar} 🪙*.`);
+});
