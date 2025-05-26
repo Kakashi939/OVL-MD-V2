@@ -22,7 +22,6 @@ if (!db) {
   });
 }
 
-// Définition de la table "ECONOMIE"
 const ECONOMIE = sequelize.define(
   "ECONOMIE",
   {
@@ -53,13 +52,11 @@ const ECONOMIE = sequelize.define(
   }
 );
 
-// Synchronisation de la table
 (async () => {
   await ECONOMIE.sync();
   console.log("Table 'ECONOMIE' synchronisée avec succès.");
 })();
 
-// ✅ 1. Ajouter un utilisateur
 async function ajouterUtilisateur(jid, pseudo = "Utilisateur") {
   return await ECONOMIE.findOrCreate({
     where: { id: jid },
@@ -72,34 +69,37 @@ async function ajouterUtilisateur(jid, pseudo = "Utilisateur") {
   });
 }
 
-// ✅ 2. Supprimer un utilisateur
 async function supprimerUtilisateur(jid) {
   return await ECONOMIE.destroy({ where: { id: jid } });
 }
 
-// ✅ 3. Obtenir les infos d'un utilisateur
 async function getInfosUtilisateur(jid) {
   const user = await ECONOMIE.findOne({ where: { id: jid } });
   if (!user) return null;
   return user.dataValues;
 }
 
-// ✅ 4. Ajouter ou retirer de l'argent (wallet ou banque)
 async function modifierSolde(jid, type = "portefeuille", montant = 0) {
   const utilisateur = await ECONOMIE.findOne({ where: { id: jid } });
   if (!utilisateur) return null;
 
-  if (type !== "portefeuille" && type !== "banque") {
+  if (!["portefeuille", "banque"].includes(type)) {
     throw new Error("Type de solde invalide. Utilise 'portefeuille' ou 'banque'.");
   }
 
-  utilisateur[type] += montant;
-  if (utilisateur[type] < 0) utilisateur[type] = 0;
+  const ancienSolde = utilisateur[type];
+  const valeurAbsolue = Math.abs(montant);
+
+  const nouveauSolde = montant < 0
+    ? Math.max(ancienSolde - valeurAbsolue, 0)
+    : ancienSolde + valeurAbsolue;
+
+  utilisateur[type] = nouveauSolde;
   await utilisateur.save();
-  return utilisateur[type];
+
+  return { nouveauSolde };
 }
 
-// ✅ 5. Mettre à jour la capacité de la banque
 async function mettreAJourCapaciteBanque(jid, nouvelleCapacite) {
   const utilisateur = await ECONOMIE.findOne({ where: { id: jid } });
   if (!utilisateur) return null;
@@ -108,7 +108,6 @@ async function mettreAJourCapaciteBanque(jid, nouvelleCapacite) {
   return utilisateur.capacite_banque;
 }
 
-// ✅ 6. Mettre à jour le pseudo
 async function changerPseudo(jid, nouveauPseudo) {
   const utilisateur = await ECONOMIE.findOne({ where: { id: jid } });
   if (!utilisateur) return null;
@@ -117,7 +116,6 @@ async function changerPseudo(jid, nouveauPseudo) {
   return utilisateur.pseudo;
 }
 
-// ✅ 7. Réinitialiser un ou plusieurs champs (portefeuille, banque, capacité banque)
 async function resetEconomie(jid, options = { wallet: false, banque: false, capacite: false }) {
   const utilisateur = await ECONOMIE.findOne({ where: { id: jid } });
   if (!utilisateur) return null;
