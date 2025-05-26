@@ -1,5 +1,5 @@
 const { ovlcmd } = require("../lib/ovlcmd");
-const { modifierSolde, getInfosUtilisateur, resetEconomie } = require("../../DataBase/economie");
+const { modifierSolde, getInfosUtilisateur, resetEconomie, mettreAJourCapaciteBanque } = require("../../DataBase/economie");
 const crypto = require("crypto");
 
 function generateUserId(jid) {
@@ -162,43 +162,46 @@ ovlcmd(
 );
 
 const prixCapacite = {
-  1: { montant: 10000, capacite: 100000 },
-  2: { montant: 100000, capacite: 1000000 },
-  3: { montant: 1000000, capacite: 10000000 },
-  4: { montant: 10000000, capacite: 100000000 },
-  5: { montant: 100000000, capacite: 1000000000 },
+  1: { montant: 10000, capacite: 100000 },
+  2: { montant: 100000, capacite: 1000000 },
+  3: { montant: 1000000, capacite: 10000000 },
+  4: { montant: 10000000, capacite: 100000000 },
+  5: { montant: 100000000, capacite: 1000000000 },
 };
 
 ovlcmd(
-  {
-    nom_cmd: "capacite",
-    react: "📦",
-    desc: "Augmenter la capacite de la banque"
-  },
-  async (ms_org, ovl, { arg, auteur_Message, repondre }) => {
-    const niveau = parseInt(arg[0]);
+  {
+    nom_cmd: "capacite",
+    react: "📦",
+    desc: "Augmenter la capacite de la banque"
+  },
+  async (ms_org, ovl, { arg, auteur_Message, repondre }) => {
+    const niveau = parseInt(arg[0]);
 
-    if (!niveau || !prixCapacite[niveau]) {
-      return repondre("Veuillez choisir un niveau entre 1 et 5.");
-    }
+    if (!niveau || !prixCapacite[niveau]) {
+      let messageErreur = "❌ *Niveau invalide.*\n\n📦 *Niveaux disponibles :*\n";
+      for (const [niveau, { montant, capacite }] of Object.entries(prixCapacite)) {
+        messageErreur += `\n🔹 Niveau ${niveau} → 💰 ${montant} 🪙 → 📈 Capacité : ${capacite} 🪙`;
+      }
+      return repondre(messageErreur);
+    }
 
-    const utilisateur = await getInfosUtilisateur(auteur);
-    const { portefeuille } = utilisateur;
+    const utilisateur = await getInfosUtilisateur(auteur_Message);
+    const { portefeuille } = utilisateur;
 
-    const { montant, capacite } = prixCapacite[niveau];
+    const { montant, capacite } = prixCapacite[niveau];
 
-    if (portefeuille < montant) {
-      return repondre(`💸 Fonds insuffisants. Il faut ${montant} 🪙 dans le portefeuille.`);
-    }
+    if (portefeuille < montant) {
+      return repondre(`💸 Fonds insuffisants. Il faut *${montant} 🪙* dans le portefeuille.`);
+    }
 
-    await modifierSolde(auteur_Message, { portefeuille: -montant, capacite_banque: capacite }, true);
+    await modifierSolde(auteur_Message, "portefeuille", -montant);
+    await mettreAJourCapaciteBanque(auteur_Message, capacite);
 
-    repondre(
-      `✅ *Capacité améliorée au niveau ${niveau}*
-📦 *Nouvelle capacité :* ${capacite} 🪙
-💰 *Coût :* ${montant} 🪙`
-    );
-  }
+    repondre(
+      `✅ *Capacité améliorée au niveau ${niveau}*\n📦 *Nouvelle capacité :* ${capacite} 🪙\n💰 *Coût :* ${montant} 🪙`
+    );
+  }
 );
 
 ovlcmd(
@@ -224,7 +227,8 @@ ovlcmd(
       return repondre(`Ce dépôt dépasserait la capacité de votre banque (${capacite_banque} 🪙).`);
     }
 
-    await modifierSolde(auteur_Message, { portefeuille: -montant, banque: montant }, true);
+    await modifierSolde(auteur_Message, "portefeuille", -montant);
+    await modifierSolde(auteur_Message, "banque", montant);
 
     repondre(
       `🏦 *Dépôt effectué avec succès !*
@@ -256,11 +260,9 @@ ovlcmd(
     const montantFinal = Math.floor(montant * 0.99);
     const frais = montant - montantFinal;
 
-    await modifierSolde(auteur_Message, {
-      banque: -montant,
-      portefeuille: montantFinal
-    }, true);
-
+    await modifierSolde(auteur_Message, "banque", -montant);
+    await modifierSolde(auteur_Message, "portefeuille", montantFinal);
+      
     repondre(
       `💼 *Retrait effectué avec succès !*
 💰 *Montant demandé :* ${montant} 🪙
