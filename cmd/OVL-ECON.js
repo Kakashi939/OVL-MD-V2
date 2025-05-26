@@ -373,7 +373,7 @@ ovlcmd(
     };
 
     await ovl.sendMessage(ms_org, {
-      image: { url: imagesDirection[direction] },
+      image: { url: imagesDirection[directionAleatoire] },
       caption: '',
     }, { quoted: ms });
 
