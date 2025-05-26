@@ -136,7 +136,7 @@ ovlcmd(
     react: "♻️",
     desc: "Réinitialise le compte économie d'un utilisateur"
   },
-  async (ms_org, ovl, { arg, auteur_Msg_Repondu }) => {
+  async (ms_org, ovl, { arg, prenium_id, auteur_Msg_Repondu }) => {
     if (!prenium_id) {
       return repondre("Vous n'avez pas l'autorisation d'exécuter cette commande.");
     }
