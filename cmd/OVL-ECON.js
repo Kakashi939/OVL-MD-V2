@@ -493,6 +493,7 @@ ovlcmd(
     desc: "Réclame un bonus toutes les 2 heures"
   },
   async (ms_org, ovl, { auteur_Message, repondre }) => {
+    const uti = await ECONOMIE.findOne({ where: { id: auteur_Message } });
     const utilisateur = await getInfosUtilisateur(auteur_Message);
     const maintenant = Date.now();
     const deuxHeures = 2 * 60 * 60 * 1000;
@@ -510,8 +511,8 @@ ovlcmd(
     }
 
     await modifierSolde(auteur_Message, "portefeuille", 1000);
-    utilisateur.last_bonus = maintenant;
-    await utilisateur.save();
+    uti.last_bonus = maintenant;
+    await uti.save();
 
     repondre("🎉 Tu as reçu *1000 pièces* ! Reviens dans 2h pour un autre bonus.");
   }
@@ -549,5 +550,37 @@ ovlcmd(
     await modifierSolde(destinataire, "portefeuille", montant);
 
     repondre(`✅ Tu as donné *${montant} pièces* à @${destinataire.split("@")[0]} 💸`);
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "topecon",
+    classe: "OVL-ECON--y",
+    react: "🏦",
+    desc: "Affiche les 10 utilisateurs avec la plus grande banque."
+  },
+  async (ms_org, ovl, { repondre }) => {
+    try {
+      const top = TopBanque();
+      if (!top.length) {
+        return repondre("Aucun utilisateur trouvé dans la base.");
+      }
+
+      let message = "🏆 *Top 10 des plus grosses Banques* 🏆\n\n";
+
+      top.forEach((u, i) => {
+        message += `*${i + 1}.* 👤 ${u.id}\n`;
+        message += ` 💰 Portefeuille : ${u.portefeuille}\n`;
+        message += ` 🏦 Banque      : ${u.bank}\n`;
+        message += ` 📦 Capacité   : ${u.capacite}\n\n`;
+      });
+
+      await repondre(message);
+
+    } catch (err) {
+      console.error("Erreur topecon :", err);
+      repondre("Une erreur est survenue lors de la récupération des données.");
+    }
   }
 );
