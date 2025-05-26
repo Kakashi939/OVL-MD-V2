@@ -134,6 +134,7 @@ async function resetEconomie(jid, options = { wallet: false, banque: false, capa
 }
 
 module.exports = {
+  ECONOMIE,
   ajouterUtilisateur,
   supprimerUtilisateur,
   getInfosUtilisateur,
