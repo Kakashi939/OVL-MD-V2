@@ -16,7 +16,7 @@ ovlcmd(
     nom_cmd: "myovl_econ",
     desc: "Afficher votre portefeuille et banque",
     react: "💰",
-    classe: "Économie"
+    classe: "OVL-ECON--y"
   },
   async (ms_org, ovl, { ms, arg, auteur_Message, auteur_Msg_Repondu, repondre }) => {
     try {
@@ -63,7 +63,7 @@ ovlcmd(
     nom_cmd: "transfer",
     desc: "Transférer de l'argent de votre banque vers la banque d'un autre utilisateur",
     react: "💸",
-    classe: "Economie"
+    classe: "OVL-ECON--y"
   },
   async (ms_org, ovl, cmd) => {
     const { ms, arg, auteur_Message, repondre } = cmd;
@@ -129,6 +129,7 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "resetaccount",
+    classe: 'OVL-ECON--y',
     react: "♻️",
     desc: "Réinitialise le compte économie d'un utilisateur"
   },
@@ -177,6 +178,7 @@ const prixCapacite = {
 ovlcmd(
   {
     nom_cmd: "capacite",
+    classe: "OVL-ECON--y",
     react: "📦",
     desc: "Augmenter la capacite de la banque"
   },
@@ -212,6 +214,7 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "depot",
+    classe: "OVL-ECON--y",
     react: "🏦",
     desc: "Transférer des fonds du portefeuille vers la banque"
   },
@@ -246,6 +249,7 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "retrait",
+    classe: "OVL-ECON--y",
     react: "💼",
     desc: "Transférer des fonds de la banque vers le portefeuille"
   },
@@ -283,7 +287,7 @@ ovlcmd(
     nom_cmd: "vol",
     desc: "Tenter de voler un autre utilisateur",
     react: "🕶️",
-    classe: "Economie"
+    classe: "OVL-ECON--y"
   },
   async (ms_org, ovl, { repondre, auteur_Message, arg }) => {
     const victimeId = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
@@ -334,7 +338,7 @@ ovlcmd(
     nom_cmd: "pari",
     desc: "Parier de l'argent en devinant une direction",
     react: "🎲",
-    classe: "Economie"
+    classe: "OVL-ECON--y"
   },
   async (ms_org, ovl, { repondre, auteur_Message, arg }) => {
     const montant = parseInt(arg[0]);
@@ -386,7 +390,7 @@ ovlcmd(
     nom_cmd: "slot",
     desc: "Jouer à la machine à sous",
     react: "🎰",
-    classe: "Economie"
+    classe: "OVL-ECON--y"
   },
   async (ms_org, ovl, { auteur_Message, repondre }) => {
     const { portefeuille } = await getInfosUtilisateur(auteur_Message);
@@ -427,7 +431,7 @@ ovlcmd({
   nom_cmd: "slot2",
   desc: "Joue à la machine à sous spéciale weekend",
   react: "🎰",
-  classe: "Économie"
+  classe: "OVL-ECON--y"
 },
 async (ms_org, ovl, { auteur_Message, repondre, prefixe }) => {
   const jour = new Date().getDay();
