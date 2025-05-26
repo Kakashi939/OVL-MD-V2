@@ -9,6 +9,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { readFileSync } = require('fs');
 const sharp = require('sharp');
+const { Ranks } = require('../DataBase/rank');
 
 async function uploadToCatbox(filePath) {
   try {
@@ -808,8 +809,11 @@ ovlcmd(
       pfp = "https://files.catbox.moe/8kvevz.jpg";
     }
 
-    let tname = "OVL-MD-USER";
-
+    let tname;
+    const user = await Ranks.findOne({ where: { id: auteur_Msg_Repondu } });
+    if(user.name) { tname = user.name
+		  } else { tname = "OVL-MD-USER";
+			 }
     const couleurs = ["#FFFFFF", "#000000", "#1f1f1f", "#e3e3e3"];
     const backgroundColor = couleurs[Math.floor(Math.random() * couleurs.length)];
 
