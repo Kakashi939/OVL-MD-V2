@@ -6,7 +6,7 @@ function addAudioEffectCommand(nom_cmd, ffmpeg_filter) {
     ovlcmd(
         {
             nom_cmd: nom_cmd,
-            classe: "AudioFX",
+            classe: "FX_Audio",
             react: "🎶",
             desc: `Applique l'effet "${nom_cmd}" à un audio.`
         },
