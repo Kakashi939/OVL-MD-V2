@@ -172,10 +172,10 @@ RENDER_API_KEY=
 
 ### 👨‍💻 Développeur Principal
 - **Ainz**
-
+---
 ### 🙌 Remerciements
-Haibo_lugh – pour son soutien et aide dans la gestion du bot au support.
-
+- Haibo_lugh – pour son soutien et aide dans la gestion du bot au support.
+---
 ### 📄 Licence
 
 Distribué sous la licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus d’informations.
