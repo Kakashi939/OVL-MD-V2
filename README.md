@@ -5,9 +5,6 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/Ainz-devs/OVL-MD-V2/actions">
-        <img src="https://img.shields.io/github/actions/workflow/status/Ainz-devs/OVL-MD-V2/docker-image.yml?branch=main&style=flat-square" alt="Workflow Status" />
-    </a>
     <a href="https://opensource.org/licenses/MIT">
         <img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="MIT License" />
     </a>
