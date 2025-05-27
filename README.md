@@ -49,7 +49,7 @@
 - Créez un compte : [Lien Koyeb](https://app.koyeb.com/auth/signup)
 - Déploiement rapide : [Déployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main...)
 
-#### 🔧 Panel classique
+#### 🔧 Panel
 - Créez un serveur
 - Ajoutez `index.js`
 - Démarrez le bot
@@ -63,7 +63,7 @@
 ---
 
 <details>
-  <summary>📝 Fichier `index.js` pour déploiement sur panel</summary>
+  <summary>📝 Fichier index.js ou main.js pour déploiement sur panel</summary>
 
 ```js
 const { writeFileSync, existsSync, mkdirSync } = require('fs');
@@ -105,7 +105,7 @@ runCommand('npm', ['run', 'Ovl'], { cwd: 'ovl' });
 ---
 
 <details>
-  <summary>⚙️ Fichier `.github/workflows/deploy.yml`</summary>
+  <summary>⚙️ Fichier .github/workflows/deploy.yml</summary>
 
 ```yaml
 name: OVL-MD Bot CI
@@ -141,7 +141,7 @@ jobs:
 ---
 
 <details>
-  <summary>🔐 Exemple de fichier `.env`</summary>
+  <summary>🔐 Exemple de fichier .env</summary>
 
 ```env
 PREFIXE=🗿
@@ -164,7 +164,7 @@ RENDER_API_KEY=
 > ⚠️ **Utilisation à vos risques et périls**  
 > L'utilisation de cet outil doit se faire avec précaution. **WhatsApp interdit strictement l’usage de solutions automatisées non officielles** telles que les bots, scripts, ou clients modifiés, ce qui peut entraîner **des suspensions de compte, voire des poursuites**.  
 >  
-> ⚠️ Soyez également attentif aux tentatives d'escroquerie ou d'ingénierie sociale. **Les développeurs du projet ne vous demanderont jamais votre session WhatsApp ou des informations personnelles.**  
+> ⚠️ Soyez également attentif aux tentatives d'escroquerie ou d'ingénierie sociale. **Ne partagez pas votre session WhatsApp ni des informations personnelles.**  
 >  
 > En utilisant ce projet, vous acceptez pleinement les risques et conséquences qui peuvent en découler.
 
