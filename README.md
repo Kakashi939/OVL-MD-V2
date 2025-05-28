@@ -47,7 +47,7 @@
 
 #### <img src="https://img.shields.io/badge/Koyeb-000000?style=for-the-badge&logo=koyeb&logoColor=white" height="28" />  
 - Créez un compte : [Lien Koyeb](https://app.koyeb.com/auth/signup)  
-- Déploiement rapide : [Déployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main)
+- Déploiement rapide : [Déployer sur Koyeb](https://app.koyeb.com/deploy?type=git&name=ovl-md&repository=https%3A%2F%2Fgithub.com%2FAinz-devs%2FOVL-MD-V2&branch=main&builder=dockerfile&env[PREFIXE]=%F0%9F%97%BF&env[NOM_OWNER]=Ainz&env[NUMERO_OWNER]=226xxxxxxxx&env[MODE]=public&env[MENU]=https%3A%2F%2Fi.ibb.co%2Fynx9QcZ%2Fimage.jpg&env[SESSION_ID]=ovl&env[DATABASE]=&env[LEVEL_UP]=non&env[STICKER_PACK_NAME]=Wa-sticker&env[STICKER_AUTHOR_NAME]=OVL-MD)
 
 #### <img src="https://img.shields.io/badge/Panel-grey?style=for-the-badge&logo=windows-terminal&logoColor=white" height="28" />  
 - Créez un serveur  
