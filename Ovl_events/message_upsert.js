@@ -2,7 +2,7 @@ const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv
 const { Bans } = require("../DataBase/ban");
 const { Sudo } = require('../DataBase/sudo');
 const { getMessage, addMessage } = require('../lib/store');
-const { jidDecode, getContentType } = require("ovl_wa_baileys");
+const { jidDecode, getContentType } = require("@whiskeysockets/baileys");
 let evt = require("../lib/ovlcmd");
 const config = require("../set");
 const prefixe = config.PREFIXE || "";
