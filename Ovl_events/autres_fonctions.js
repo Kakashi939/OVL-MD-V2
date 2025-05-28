@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { downloadContentFromMessage } = require("ovl_wa_baileys");
+const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 const FileType = require('file-type');
 
 async function dl_save_media_ms(ovl, message, filename = '', attachExtension = true, directory = './downloads') {
