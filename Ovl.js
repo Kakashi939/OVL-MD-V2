@@ -12,7 +12,7 @@ const {
     Browsers,
     downloadContentFromMessage,
     DisconnectReason
-} = require("ovl_wa_baileys");
+} = require("@whiskeysockets/baileys");
 
 const config = require("./set");
 const session = config.SESSION_ID || "";
