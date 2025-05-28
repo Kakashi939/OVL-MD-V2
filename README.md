@@ -39,24 +39,24 @@
 - 🛠️ [Créer une base Supabase](https://supabase.com)
 - Ou utilisez une existante.
 
-### Étape 4 : Méthodes de déploiement
+### 🚀 Étape 4 : Méthodes de déploiement
 
-#### ☁️ Render
-- Créez un compte : [Lien Render](https://dashboard.render.com/register)
-- Lancez le déploiement : [Déployer sur Render](https://dashboard.render.com/web/new)
+#### <img src="https://img.shields.io/badge/Render-12100E?style=for-the-badge&logo=render&logoColor=white" height="28" />  
+- Créez un compte : [Lien Render](https://dashboard.render.com/register)  
+- Déploiement rapide : [Déployer sur Render](https://dashboard.render.com/web/new)
 
-#### ☁️ Koyeb
-- Créez un compte : [Lien Koyeb](https://app.koyeb.com/auth/signup)
-- Déploiement rapide : [Déployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main...)
+#### <img src="https://img.shields.io/badge/Koyeb-000000?style=for-the-badge&logo=koyeb&logoColor=white" height="28" />  
+- Créez un compte : [Lien Koyeb](https://app.koyeb.com/auth/signup)  
+- Déploiement rapide : [Déployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main)
 
-#### 🔧 Panel
-- Créez un serveur
-- Ajoutez `index.js`
+#### <img src="https://img.shields.io/badge/Panel%20classique-grey?style=for-the-badge&logo=windows-terminal&logoColor=white" height="28" />  
+- Créez un serveur  
+- Ajoutez le fichier `index.js`  
 - Démarrez le bot
 
-#### 🛠️ GitHub Actions
-- Ajoutez un fichier `.env`
-- Créez un fichier `.github/workflows/deploy.yml`
+#### <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" height="28" />  
+- Ajoutez un fichier `.env`  
+- Créez le fichier `.github/workflows/deploy.yml`
 
 </details>
 
