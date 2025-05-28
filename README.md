@@ -1,4 +1,4 @@
-## `OVL-MD-V2`
+<h1 align="center">OVL-MD-V2</h1>
 
 <p align="center"> 
     <img alt="OVL" src="https://files.catbox.moe/k1gddi.jpg">
