@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { delay, DisconnectReason } = require("ovl_wa_baileys");
+const { delay, DisconnectReason } = require("@whiskeysockets/baileys");
 let evt = require("../lib/ovlcmd");
 const config = require("../set");
 
