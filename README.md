@@ -160,13 +160,19 @@ RENDER_API_KEY=
 </details>
 
 ---
+<details>
+  <summary>⚠️ Important</summary>
 
-> ⚠️ **Utilisation à vos risques et périls**  
-> L'utilisation de cet outil doit se faire avec précaution. **WhatsApp interdit strictement l’usage de solutions automatisées non officielles** telles que les bots, scripts, ou clients modifiés, ce qui peut entraîner **des suspensions de compte, voire des poursuites**.  
+<br>
+
+> **Utilisation à vos risques et périls**  
+> ⚠️ L'utilisation de cet outil doit se faire avec précaution. **WhatsApp interdit strictement l’usage de solutions automatisées non officielles** telles que les bots, scripts, ou clients modifiés, ce qui peut entraîner **des suspensions de compte, voire des poursuites**.  
 >  
-> ⚠️ Soyez également attentif aux tentatives d'escroquerie ou d'ingénierie sociale. **Ne partagez pas votre session WhatsApp ni des informations personnelles.**  
+> 🔐 Soyez également attentif aux tentatives d'escroquerie ou d'ingénierie sociale. **Ne partagez pas votre session WhatsApp ni des informations personnelles.**  
 >  
-> En utilisant ce projet, vous acceptez pleinement les risques et conséquences qui peuvent en découler.
+> ✅ En utilisant ce projet, vous acceptez pleinement les risques et conséquences qui peuvent en découler.
+
+</details>
 
 ---
 
