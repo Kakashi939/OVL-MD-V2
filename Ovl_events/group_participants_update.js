@@ -1,5 +1,5 @@
 const { GroupSettings } = require("../DataBase/events");
-const { jidDecode } = require("ovl_wa_baileys");
+const { jidDecode } = require("@whiskeysockets/baileys");
 
 async function group_participants_update (data, ovl) {
     const parseID = (jid) => {
