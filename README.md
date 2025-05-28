@@ -49,9 +49,9 @@
 - Créez un compte : [Lien Koyeb](https://app.koyeb.com/auth/signup)  
 - Déploiement rapide : [Déployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main)
 
-#### <img src="https://img.shields.io/badge/Panel%20classique-grey?style=for-the-badge&logo=windows-terminal&logoColor=white" height="28" />  
+#### <img src="https://img.shields.io/badge/Panel-grey?style=for-the-badge&logo=windows-terminal&logoColor=white" height="28" />  
 - Créez un serveur  
-- Ajoutez le fichier `index.js`  
+- Ajoutez le fichier `index.js` ou `main.js`
 - Démarrez le bot
 
 #### <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" height="28" />  
