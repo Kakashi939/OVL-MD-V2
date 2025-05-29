@@ -51,6 +51,7 @@ async function message_upsert(m, ovl) {
     const mentioned = ms.message.extendedTextMessage?.contextInfo?.mentionedJid;
 
     const sender = isGroup ? ms.key.participant : decodeJid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
+    console.log(sender);
     const senderName = ms.pushName;
 
     const arg = texte.trim().split(/ +/).slice(1);
