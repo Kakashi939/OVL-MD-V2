@@ -22,6 +22,15 @@ async function message_upsert(m, ovl) {
         }
         return jid;
     };
+    async function lidToJid(lid) {
+  try {
+    const metadata = await ovl.groupMetadata(lid);
+    return metadata.id;
+  } catch (e) {
+    console.error("Erreur lors de la conversion du LID :", e);
+    return null;
+  }
+}
 
     const mtype = getContentType(ms.message);
     const texte = {
@@ -47,11 +56,10 @@ async function message_upsert(m, ovl) {
     const isBotAdmin = isGroup && admins.includes(id_Bot);
 
     const msgReply = ms.message.extendedTextMessage?.contextInfo?.quotedMessage;
-    const replyAuthor = decodeJid(ms.message.extendedTextMessage?.contextInfo?.participant);
+    const replyAuthor = await lidToJid(ms.message.extendedTextMessage?.contextInfo?.participant);
     const mentioned = ms.message.extendedTextMessage?.contextInfo?.mentionedJid;
 
-    const sender = isGroup ? ms.key.participant : decodeJid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
-    console.log(sender);
+    const sender = isGroup ? await lidToJid(ms.key.participant) : decodeJid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
     const senderName = ms.pushName;
 
     const arg = texte.trim().split(/ +/).slice(1);
