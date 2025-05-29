@@ -1,7 +1,7 @@
 const groupCache = new Map();
 
 async function getmetadata(ovl, jid) {
-    if (!jid || typeof jid !== 'string' || !jid.endsWith('@g.us')) return null;
+   // if (!jid || typeof jid !== 'string' || !jid.endsWith('@g.us')) return null;
 
     if (groupCache.has(jid)) {
         return groupCache.get(jid);
