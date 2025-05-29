@@ -1,4 +1,4 @@
-const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot } = require('./Message_upsert_events');
+const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot, getmetadata } = require('./Message_upsert_events');
 const { Bans } = require("../DataBase/ban");
 const { Sudo } = require('../DataBase/sudo');
 const { getMessage, addMessage } = require('../lib/store');
@@ -24,7 +24,7 @@ async function message_upsert(m, ovl) {
     };
     async function lidToJid(lid) {
   try {
-    const metadata = await ovl.groupMetadata(lid);
+    const metadata = await getmetadata(lid);
     return metadata.id;
   } catch (e) {
     console.error("Erreur lors de la conversion du LID :", e);
