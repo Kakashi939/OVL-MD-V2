@@ -520,36 +520,42 @@ ovlcmd(
 
 ovlcmd(
   {
-    nom_cmd: "don",
+    nom_cmd: "bonus",
     classe: "OVL-ECON--y",
-    react: "🤝",
-    desc: "Permet à un Premium de donner des pièces à un autre utilisateur"
+    react: "🎁",
+    desc: "Réclame un bonus toutes les 2 heures"
   },
-  async (ms_org, ovl, { arg, auteur_Message, repondre, prenium_id, dev_id }) => {
+  async (ms_org, ovl, { auteur_Message, repondre }) => {
+    const uti = await ECONOMIE.findOne({ where: { id: auteur_Message } });
     const utilisateur = await getInfosUtilisateur(auteur_Message);
-    if (!prenium_id) {
-      return repondre("Cette commande est réservée aux utilisateurs Premium.");
+    const maintenant = Date.now();
+    const deuxHeures = 2 * 60 * 60 * 1000;
+
+    if (!utilisateur.last_bonus) {
+      utilisateur.last_bonus = 0;
     }
 
-    const destinataire = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    if (!destinataire) return repondre("Mentionne la personne à qui tu veux donner de l'argent.");
+    const tempsEcoule = maintenant - utilisateur.last_bonus;
+    if (tempsEcoule < deuxHeures) {
+      const tempsRestant = deuxHeures - tempsEcoule;
 
-    const montant = parseInt(arg[1]);
-    if (!montant || montant <= 0) return repondre("Montant invalide.");
+      const heures = Math.floor(tempsRestant / 3600000);
+      const minutes = Math.floor((tempsRestant % 3600000) / 60000);
+      const secondes = Math.floor((tempsRestant % 60000) / 1000);
 
-    const limite = 50000;
-    if (montant > limite && !dev_id) {
-      return repondre(`Tu ne peux pas donner plus de *${limite} pièces*.`);
+      let message = "⏳ Tu dois attendre encore ";
+      if (heures > 0) message += `${heures} h `;
+      if (minutes > 0) message += `${minutes} min `;
+      if (secondes > 0 || (heures === 0 && minutes === 0)) message += `${secondes} sec`;
+
+      return repondre(message.trim() + " avant de réclamer ton prochain bonus.");
     }
 
-    const destinataireExiste = await ECONOMIE.findOne({ where: { id: destinataire } });
-    if (!destinataireExiste) {
-      return repondre("L'utilisateur mentionné n'est pas enregistré dans le système.");
-    }
+    await modifierSolde(auteur_Message, "portefeuille", 1000);
+    uti.last_bonus = maintenant;
+    await uti.save();
 
-    await modifierSolde(destinataire, "portefeuille", montant);
-
-    repondre(`✅ Tu as donné *${montant} pièces* à @${destinataire.split("@")[0]} 💸`);
+    repondre("🎉 Tu as reçu *1000 pièces* ! Reviens dans 2h pour un autre bonus.");
   }
 );
 
