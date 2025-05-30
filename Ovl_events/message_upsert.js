@@ -22,12 +22,13 @@ async function message_upsert(m, ovl) {
         }
         return jid;
     };
-    async function lidToJid(lidParticipant) {
+    async function lidToJid(lidParticipant, j) {
     try {
         if (!lidParticipant) return null;
-        const metadata = await getMetadata(ovl, ms_org);
+        const metadata = await getMetadata(ovl, j);
         if (!metadata) return null;
         const membre = metadata.participants.find(p => p?.lid === lidParticipant);
+        console.log(membre?.id);
         return membre?.id || null;
     } catch (e) {
         console.error("Erreur lors de la conversion du LID participant en JID :", e.message);
@@ -59,10 +60,10 @@ async function message_upsert(m, ovl) {
     const isBotAdmin = isGroup && admins.includes(id_Bot);
 
     const msgReply = ms.message.extendedTextMessage?.contextInfo?.quotedMessage;
-    const replyAuthor = await lidToJid(ms.message.extendedTextMessage?.contextInfo?.participant);
+    const replyAuthor = await lidToJid(ms.message.extendedTextMessage?.contextInfo?.participant, ms_org);
     const mentioned = ms.message.extendedTextMessage?.contextInfo?.mentionedJid;
 
-    const sender = isGroup ? await lidToJid(ms.key.participant) : decodeJid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
+    const sender = isGroup ? await lidToJid(ms.key.participant, ms_org) : decodeJid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
     const senderName = ms.pushName;
 
     const arg = texte.trim().split(/ +/).slice(1);
