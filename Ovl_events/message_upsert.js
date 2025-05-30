@@ -22,15 +22,18 @@ async function message_upsert(m, ovl) {
         }
         return jid;
     };
-    async function lidToJid(lid) {
-  try {
-    const metadata = await getmetadata(lid);
-    return metadata.id;
-  } catch (e) {
-    console.error("Erreur lors de la conversion du LID :", e);
-    return null;
-  }
-}
+    async function lidToJid(lidParticipant) {
+    try {
+        if (!lidParticipant) return null;
+        const metadata = await getMetadata(ovl, ms_org);
+        if (!metadata) return null;
+        const membre = metadata.participants.find(p => p?.lid === lidParticipant);
+        return membre?.id || null;
+    } catch (e) {
+        console.error("Erreur lors de la conversion du LID participant en JID :", e.message);
+        return null;
+    }
+    }
 
     const mtype = getContentType(ms.message);
     const texte = {
