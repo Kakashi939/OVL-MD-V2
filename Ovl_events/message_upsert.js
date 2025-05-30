@@ -1,4 +1,4 @@
-const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot, getmetadata } = require('./Message_upsert_events');
+const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot, getMetadata } = require('./Message_upsert_events');
 const { Bans } = require("../DataBase/ban");
 const { Sudo } = require('../DataBase/sudo');
 const { getMessage, addMessage } = require('../lib/store');
