@@ -1,18 +1,16 @@
 const groupCache = new Map();
 
-async function getmetadata(ovl, jid) {
-   // if (!jid || typeof jid !== 'string' || !jid.endsWith('@g.us')) return null;
-
-    if (groupCache.has(jid)) {
-        return groupCache.get(jid);
+async function getMetadata(ovl, groupJid) {
+    if (groupCache.has(groupJid)) {
+        return groupCache.get(groupJid);
     }
 
     try {
-        const metadata = await ovl.groupMetadata(jid);
-        groupCache.set(jid, metadata);
+        const metadata = await ovl.groupMetadata(groupJid);
+        groupCache.set(groupJid, metadata);
         return metadata;
     } catch (e) {
-        console.error("❌ Erreur lors de la récupération des métadonnées du groupe :", e.message);
+        console.error("Erreur lors de la récupération des métadonnées du groupe :", e.message);
         return null;
     }
 }
