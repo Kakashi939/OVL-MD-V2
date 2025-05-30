@@ -15,4 +15,4 @@ async function getMetadata(ovl, groupJid) {
     }
 }
 
-module.exports = getmetadata;
+module.exports = getMetadata;
