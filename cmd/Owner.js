@@ -620,7 +620,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "connect",
-        classe: "Outils",
+        classe: "Owner",
         desc: "Connexion d’un compte avec le bot",
     },
     async (ms_org, ovl, cmd_options) => {
@@ -635,8 +635,8 @@ ovlcmd(
         }
 
         const numero = arg[0].replace(/[^0-9]/g, '');
-        const tmpSessionPath = path.join(__dirname, '../../session');
-        const finalSessionPath = path.join(__dirname, `../../connect/session_connect_${numero}`);
+        const tmpSessionPath = path.join(__dirname, '../session');
+        const finalSessionPath = path.join(__dirname, `../connect/session_connect_${numero}`);
 
         if (!fs.existsSync(tmpSessionPath)) fs.mkdirSync(tmpSessionPath, { recursive: true });
 
@@ -709,7 +709,7 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "connect_session",
-    classe: "Outils",
+    classe: "Owner",
     desc: "Affiche la liste des numéros connectés",
   },
   async (ms_org, ovl, cmd_options) => {
@@ -717,7 +717,7 @@ ovlcmd(
     if (!prenium_id) {
       return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
     }
-    const connectDir = path.join(__dirname, "../../connect");
+    const connectDir = path.join(__dirname, "../connect");
 
     if (!fs.existsSync(connectDir)) {
       return await ovl.sendMessage(ms_org, { text: "Aucune session trouvée." }, { quoted: ms });
@@ -740,5 +740,38 @@ ovlcmd(
       text: `📡 *Sessions connectées (${lids.length})* :\n\n${texte}`,
       mentions: lids,
     }, { quoted: ms });
+  }
+  );
+
+ovlcmd(
+  {
+    nom_cmd: "delete_session",
+    classe: "Owner",
+    desc: "Supprime une session connectée par numéro",
+  },
+  async (ms_org, ovl, cmd_options) => {
+    const { arg, ms, prenium_id } = cmd_options;
+
+    if (!prenium_id) {
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
+    }
+    
+    if (!arg || !arg[0]) {
+      return await ovl.sendMessage(ms_org, { text: "Usage : .delete_session 226xxxxxxxx" }, { quoted: ms });
+    }
+
+    const numero = arg[0].replace(/[^0-9]/g, '');
+    const sessionPath = path.join(__dirname, `../connect/session_connect_${numero}`);
+
+    if (!fs.existsSync(sessionPath)) {
+      return await ovl.sendMessage(ms_org, { text: `❌ Aucune session trouvée pour le numéro : ${numero}` }, { quoted: ms });
+    }
+
+    try {
+      fs.rmSync(sessionPath, { recursive: true, force: true });
+      await ovl.sendMessage(ms_org, { text: `✅ Session pour le numéro ${numero} supprimée avec succès.` }, { quoted: ms });
+    } catch (err) {
+      await ovl.sendMessage(ms_org, { text: `❌ Erreur lors de la suppression de la session : ${err.message}` }, { quoted: ms });
+    }
   }
 );
