@@ -268,7 +268,7 @@ ovlcmd(
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
     const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    const membre = JidToLid(cibl); 
+    const membre = await JidToLid(cibl); 
         if (!verif_Ovl_Admin)
       return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
 
@@ -335,7 +335,7 @@ ovlcmd(
   }
 );
 
-ovlcmd(
+/*ovlcmd(
   {
     nom_cmd: "ckick",
     classe: "Groupe",
@@ -383,7 +383,7 @@ ovlcmd(
 
     ovl.sendMessage(ms_org, { text: `✅ ${membresToKick.length} membre(s) avec l'indicatif ${indicatif} ont été exclus.` }, { quoted: ms });
   }
-);
+);*/
 
 ovlcmd(
   {
@@ -399,7 +399,7 @@ ovlcmd(
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
     const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    const membre = JidToLid(cibl); 
+    const membre = await JidToLid(cibl); 
     if (!verif_Ovl_Admin)
       return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à promouvoir." }, { quoted: ms });
@@ -434,7 +434,7 @@ ovlcmd(
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
     const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    const membre = JidToLid(cibl); 
+    const membre = await JidToLid(cibl); 
     if (!verif_Ovl_Admin)
       return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à rétrograder." }, { quoted: ms });
@@ -510,41 +510,51 @@ ovlcmd(
     }
 
     if (arg.length === 0 && !auteur_Msg_Repondu) {
-      return ovl.sendMessage(jid, { text: `Veuillez fournir un nom pour le groupe et mentionner des membres ou répondre à un message contenant des tags.` }, { quoted: ms });
+      return ovl.sendMessage(jid, {
+        text: `Veuillez fournir un nom pour le groupe et mentionner des membres ou répondre à un message contenant des tags.`,
+      }, { quoted: ms });
     }
 
     const name = arg[0];
     const membres = [];
 
     if (arg.length > 1) {
-      arg.slice(1).forEach((tag) => {
+      for (const tag of arg.slice(1)) {
         if (tag.startsWith("@")) {
-          const cibl = tag.replace("@", "")}@s.whatsapp.net
-          const cible = JidToLid(cibl); 
-          membres.push(cible);
+          const cibleJid = `${tag.replace("@", "")}@s.whatsapp.net`;
+          const lid = await JidToLid(cibleJid);
+          if (lid) membres.push(lid);
         }
-      });
+      }
     }
 
-    if (membres.length === 0 && auteur_Msg_Repondu) {
-      auteur_Msg_Repondu.mentions.forEach((mention) => {
-        membres.push(mention);
-      });
+    if (membres.length === 0 && auteur_Msg_Repondu?.mentions?.length > 0) {
+      for (const mention of auteur_Msg_Repondu.mentions) {
+        const lid = await JidToLid(mention);
+        if (lid) membres.push(lid);
+      }
     }
 
     if (membres.length === 0) {
-      return ovl.sendMessage(jid, { text: `Aucun membre mentionné ou tagué trouvé pour ajouter au groupe.` }, { quoted: ms });
+      return ovl.sendMessage(jid, {
+        text: `Aucun membre mentionné ou tagué trouvé pour ajouter au groupe.`,
+      }, { quoted: ms });
     }
 
     try {
       const group = await ovl.groupCreate(name, membres);
-      await ovl.sendMessage(group.id, { text: `Groupe "${name}" créé avec succès ! 🎉` }, { quoted: ms });
+      await ovl.sendMessage(group.id, {
+        text: `Groupe "${name}" créé avec succès ! 🎉`,
+      }, { quoted: ms });
     } catch (err) {
       console.error("Erreur lors de la création du groupe :", err);
-      await ovl.sendMessage(jid, { text: `Une erreur est survenue lors de la création du groupe. Veuillez réessayer.` }, { quoted: ms });
+      await ovl.sendMessage(jid, {
+        text: `Une erreur est survenue lors de la création du groupe. Veuillez réessayer.`,
+      }, { quoted: ms });
     }
   }
 );
+
 
 ovlcmd(
   {
@@ -896,7 +906,7 @@ ovlcmd(
 );
 
 
-ovlcmd(
+/*ovlcmd(
   {
     nom_cmd: "vcf",
     classe: "Groupe",
@@ -941,7 +951,7 @@ ovlcmd(
     }
   }
 );
-
+*/
 ovlcmd(
   {
     nom_cmd: "antilink",
