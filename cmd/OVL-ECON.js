@@ -437,12 +437,12 @@ ovlcmd({
   react: "🎰",
   classe: "OVL-ECON--y"
 },
-async (ms_org, ovl, { auteur_Message, repondre, prefixe }) => {
+async (ms_org, ovl, { arg, auteur_Message, repondre, prefixe }) => {
   const jour = new Date().getDay();
   if (![5, 6, 0].includes(jour)) return repondre("🎮 Tu peux jouer uniquement pendant le weekend : *vendredi, samedi, dimanche*.");
 
   const { portefeuille } = await getInfosUtilisateur(auteur_Message);
-  const mise = parseInt(ovl.split(" ")[0]) || 100;
+  const mise = parseInt(arg.split(" ")[0]) || 100;
 
   if (mise > portefeuille) return repondre(`💰 Tu n'as que *${portefeuille} 🪙* dans ton portefeuille.`);
 
