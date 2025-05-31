@@ -262,13 +262,14 @@ ovlcmd(
     desc: "Supprime un membre du groupe.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, verif_Ovl_Admin, prenium_id, dev_num, ms } = cmd_options;
+    const { verif_Groupe, JidToLid, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, verif_Ovl_Admin, prenium_id, dev_num, ms } = cmd_options;
     if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (prenium_id || verif_Admin) {
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
-    const membre = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-      if (!verif_Ovl_Admin)
+    const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const membre = JidToLid(cibl); 
+        if (!verif_Ovl_Admin)
       return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
 
      if (!membre || !membres.find((m) => m.id === membre))
@@ -342,7 +343,7 @@ ovlcmd(
     desc: "Supprime tous les membres non administrateurs dont le JID commence par un indicatif spécifique.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Ovl_Admin, infos_Groupe, arg, dev_num, prenium_id, ms, auteur_Message } = cmd_options;
+    const { verif_Groupe, JidToLid, verif_Ovl_Admin, infos_Groupe, arg, dev_num, prenium_id, ms, auteur_Message } = cmd_options;
 
     if (!verif_Groupe)
       return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
@@ -392,12 +393,13 @@ ovlcmd(
     desc: "Promouvoir un membre comme administrateur.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, ms } = cmd_options;
+    const { verif_Groupe, JidToLid, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, ms } = cmd_options;
     if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (verif_Admin || prenium_id) {
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
-    const membre = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const membre = JidToLid(cibl); 
     if (!verif_Ovl_Admin)
       return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à promouvoir." }, { quoted: ms });
@@ -426,12 +428,13 @@ ovlcmd(
     desc: "Retirer le rôle d'administrateur à un membre.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, dev_num, dev_id, ms } = cmd_options;
+    const { verif_Groupe, JidToLid, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, dev_num, dev_id, ms } = cmd_options;
     if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (verif_Admin || prenium_id) { 
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
-    const membre = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+    const membre = JidToLid(cibl); 
     if (!verif_Ovl_Admin)
       return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à rétrograder." }, { quoted: ms });
@@ -500,7 +503,7 @@ ovlcmd(
     desc: "Permet de créer un groupe et d'y ajouter des membres mentionnés.",
   },
   async (jid, ovl, cmd_options) => {
-    const { arg, prenium_id, auteur_Msg_Repondu, ms } = cmd_options;
+    const { arg, prenium_id, auteur_Msg_Repondu, ms, JidToLid } = cmd_options;
 
     if (!prenium_id) {
       return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour créer un groupe.` }, { quoted: ms });
@@ -516,7 +519,9 @@ ovlcmd(
     if (arg.length > 1) {
       arg.slice(1).forEach((tag) => {
         if (tag.startsWith("@")) {
-          membres.push(`${tag.replace("@", "")}@s.whatsapp.net`);
+          const cibl = tag.replace("@", "")}@s.whatsapp.net
+          const cible = JidToLid(cibl); 
+          membres.push(cible);
         }
       });
     }
