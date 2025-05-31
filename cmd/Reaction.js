@@ -185,7 +185,7 @@ function addReactionCommand(nom_cmd, url) {
             desc: `Réaction de type ${nom_cmd}`,
         },
         async (ms_org, ovl, cmd_options) => {
-            const { arg, auteur_Message, auteur_Msg_Repondu, repondre, ms } = cmd_options;
+            const { arg, auteur_Message, auteur_Msg_Repondu, repondre, ms, JidToLid } = cmd_options;
             const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
             const cible = JidToLid(cibl);
 
