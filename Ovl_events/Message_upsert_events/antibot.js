@@ -23,7 +23,7 @@ async function antibot(ovl, ms_org, ms, verif_Groupe, verif_Admin, verif_Ovl_Adm
                                 text: `@${auteur_Message.split("@")[0]}, les bots ne sont pas autorisés ici.`,
                                 mentions: [auteur_Message]
                             });
-                            await ovl.sendMessage(ms_org, { delete: ms.key });
+                            await ovl.sendMessage(ms_org, { delete: key });
                             break;
 
                         case 'kick':
@@ -31,7 +31,7 @@ async function antibot(ovl, ms_org, ms, verif_Groupe, verif_Admin, verif_Ovl_Adm
                                 text: `@${auteur_Message.split("@")[0]} a été retiré pour avoir utilisé un bot.`,
                                 mentions: [auteur_Message]
                             });
-                            await ovl.sendMessage(ms_org, { delete: ms.key });
+                            await ovl.sendMessage(ms_org, { delete: key });
                             await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
                             break;
 
@@ -55,7 +55,7 @@ async function antibot(ovl, ms_org, ms, verif_Groupe, verif_Admin, verif_Ovl_Adm
                                         text: `@${auteur_Message.split("@")[0]} a été retiré après 3 avertissements.`,
                                         mentions: [auteur_Message]
                                     });
-                                    await ovl.sendMessage(ms_org, { delete: ms.key });
+                                    await ovl.sendMessage(ms_org, { delete: key });
                                     await ovl.groupParticipantsUpdate(ms_org, [auteur_Message], "remove");
                                     await warning.destroy();
                                 } else {
