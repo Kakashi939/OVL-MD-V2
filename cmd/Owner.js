@@ -640,11 +640,6 @@ ovlcmd(
     }
 );
 
-const fs = require('fs');
-const path = require('path');
-const { makeWASocket, useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, delay, Browsers, msgRetryCounterCache } = require('@whiskeysockets/baileys');
-const pino = require('pino');
-
 ovlcmd(
     {
         nom_cmd: "connect",
