@@ -764,7 +764,7 @@ ovlcmd(
       mentions: lids,
     }, { quoted: ms });
   }
-  );
+);
 
 ovlcmd(
   {
