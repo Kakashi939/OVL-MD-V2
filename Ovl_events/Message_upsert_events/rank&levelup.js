@@ -3,7 +3,7 @@ const { Ranks } = require('../../DataBase/rank');
 const { changerPseudo, ajouterUtilisateur, getInfosUtilisateur } = require('../../DataBase/economie');
 
 async function rankAndLevelUp(ovl, ms_org, texte, auteur_Message, nom_Auteur_Message, config) {
-    if (texte) {
+    if (texte && auteur_Message) {
         const userId = auteur_Message;
         const infosUser = await getInfosUtilisateur(userId);
         if (!infosUser) {
