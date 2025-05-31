@@ -2,77 +2,101 @@ const fs = require('fs');
 const path = require('path');
 const pino = require("pino");
 const axios = require('axios');
-const express = require('express');
 const {
     default: makeWASocket,
     useMultiFileAuthState,
-    logger,
     makeCacheableSignalKeyStore,
     fetchLatestBaileysVersion,
-    Browsers,
-    downloadContentFromMessage,
-    DisconnectReason
+    Browsers
 } = require("@whiskeysockets/baileys");
-
 const config = require("./set");
-const session = config.SESSION_ID || "";
-const { message_upsert, group_participants_update, connection_update, dl_save_media_ms } = require('./Ovl_events');
-
+const sessId = config.SESSION_ID || "";
 const app = express();
 const port = process.env.PORT || 3000;
+const {
+    message_upsert,
+    group_participants_update,
+    connection_update,
+    dl_save_media_ms,
+    recup_msg
+} = require('./Ovl_events');
 
-async function ovlAuth(session) {
+const dirAuth = path.join(__dirname, 'auth');
+const dirConn = path.join(__dirname, 'connect');
+
+async function recupSessPrincipale(sess) {
     try {
-        if (session.startsWith("Ovl-MD_") && session.endsWith("_SESSION-ID")) {
-            const sessionId = session.slice(7, -11);
-            const response = await axios.get('https://pastebin.com/raw/' + sessionId);
-            const data = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-            const filePath = path.join(__dirname, 'auth', 'creds.json');
-            fs.writeFileSync(filePath, data, 'utf8');
+        if (sess.startsWith("Ovl-MD_") && sess.endsWith("_SESSION-ID")) {
+            const id = sess.slice(7, -11);
+            const res = await axios.get('https://pastebin.com/raw/' + id);
+            const data = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+            if (!fs.existsSync(dirAuth)) fs.mkdirSync(dirAuth, { recursive: true });
+            const fPath = path.join(dirAuth, 'creds.json');
+            fs.writeFileSync(fPath, data, 'utf8');
         }
     } catch (e) {
         console.log("Session invalide: " + (e.message || e));
     }
 }
-ovlAuth(session);
 
-async function main() {
-    const { version, isLatest } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('./auth');
-
-    try {
-        
-        const ovl = makeWASocket({
-            logger: pino({ level: "silent" }),
-            browser: Browsers.macOS("Safari"),
-            generateHighQualityLinkPreview: true,
-            syncFullHistory: false,
-            auth: {
-                creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }))
-            },
-            
-        });
-
-        
-        // Liaison des événements
-        ovl.ev.on("messages.upsert", async (m) => { message_upsert(m, ovl); });
-        ovl.ev.on('group-participants.update', async (data) => { group_participants_update(data, ovl); });
-        ovl.ev.on("connection.update", async (con) => { connection_update(con, ovl, main); });
-        ovl.ev.on("creds.update", saveCreds);
-
-        // Ajout des fonctions au bot
-        ovl.dl_save_media_ms = (msg, filename = '', attachExt = true, dir = './downloads') =>
-            dl_save_media_ms(ovl, msg, filename, attachExt, dir);
-
-        ovl.recup_msg = (params = {}) =>
-            recup_msg({ ovl, ...params });
-
-    } catch (error) {
-        console.error("Erreur principale:", error);
-    }
+function chargerSessSecondaires() {
+    if (!fs.existsSync(dirConn)) return [];
+    return fs.readdirSync(dirConn).filter(d => {
+        const p = path.join(dirConn, d);
+        return fs.lstatSync(p).isDirectory() && d.startsWith("session_connect_");
+    });
 }
-main();
+
+async function demarrerSession(dossier) {
+    const { version } = await fetchLatestBaileysVersion();
+    const { state, saveCreds } = await useMultiFileAuthState(dossier);
+
+    const ovl = makeWASocket({
+        version,
+        logger: pino({ level: "silent" }),
+        browser: Browsers.macOS("Safari"),
+        generateHighQualityLinkPreview: true,
+        syncFullHistory: false,
+        auth: {
+            creds: state.creds,
+            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }))
+        }
+    });
+
+    ovl.ev.on("messages.upsert", async (m) => { message_upsert(m, ovl); });
+    ovl.ev.on("group-participants.update", async (data) => { group_participants_update(data, ovl); });
+    ovl.ev.on("connection.update", async (con) => {
+        connection_update(con, ovl, () => demarrerSession(dossier));
+    });
+    ovl.ev.on("creds.update", saveCreds);
+
+    ovl.dl_save_media_ms = (msg, filename = '', attachExt = true, dir = './downloads') =>
+        dl_save_media_ms(ovl, msg, filename, attachExt, dir);
+
+    ovl.recup_msg = (params = {}) =>
+        recup_msg({ ovl, ...params });
+
+    console.log(`Session démarrée : ${path.basename(dossier)}`);
+    return ovl;
+}
+
+async function demarrerTout() {
+    await recupSessPrincipale(sessId);
+
+    const principale = await demarrerSession(dirAuth);
+
+    const secondaires = [];
+    const dossiers = chargerSessSecondaires();
+    for (const d of dossiers) {
+        const p = path.join(dirConn, d);
+        const c = await demarrerSession(p);
+        secondaires.push(c);
+    }
+
+    console.log(`Sessions secondaires lancées : ${dossiers.length}`);
+}
+
+demarrerTout().catch(console.error);
 
 // Serveur Express
 let dernierPingRecu = Date.now();
