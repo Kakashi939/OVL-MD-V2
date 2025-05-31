@@ -9,5 +9,5 @@ module.exports = {
   antitag: require('./antitag'),
   antilink: require('./antilink'),
   antibot: require('./antibot'),
-  getMetadata: require('./cache'),
+  getLid: require('./cache'),
 };
