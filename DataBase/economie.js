@@ -34,19 +34,19 @@ const ECONOMIE = sequelize.define(
       defaultValue: "Utilisateur",
     },
     portefeuille: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       defaultValue: 0,
     },
     banque: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       defaultValue: 0,
     },
     capacite_banque: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       defaultValue: 10000,
     },
     last_bonus: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       defaultValue: 0,
     },
   },
