@@ -23,7 +23,7 @@ async function message_upsert(m, ovl) {
         return jid;
     };
 
-    async function JidToLid(j) {
+    async function JidToLid(j, ovl) {
         try {
             if (!j) return null;
             const lid = await getLid(j);
