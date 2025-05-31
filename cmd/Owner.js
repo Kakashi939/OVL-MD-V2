@@ -755,7 +755,7 @@ ovlcmd(
     const numeros = dossiers.map(n => n.replace("session_connect_", ""));
     const jids = numeros.map(n => `${n}@s.whatsapp.net`);
 
-    const lids = await Promise.all(jids.map(jid => await JidToLid(jid)));
+    const lids = await Promise.all(jids.map(jid =>  JidToLid(jid)));
 
     const texte = lids.map(lid => `@${lid.split("@")[0]}`).join("\n");
 
