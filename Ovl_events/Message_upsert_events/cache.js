@@ -1,18 +1,21 @@
 const groupCache = new Map();
 
-async function getMetadata(ovl, groupJid) {
-    if (groupCache.has(groupJid)) {
-        return groupCache.get(groupJid);
-    }
-
+async function JidToLid(jid, ovl) {
     try {
-        const metadata = await ovl.groupMetadata(groupJid);
-        groupCache.set(groupJid, metadata);
-        return metadata;
+        if (!jid || typeof jid !== "string") return null;
+        if (jid.endsWith("@lid")) return jid;
+        if (groupCache.has(jid)) return groupCache.get(jid);
+
+        const result = await ovl.onWhatsApp(jid);
+        if (!result || !result[0]?.lid) return null;
+
+        const lid = result[0].lid;
+        groupCache.set(jid, lid);
+        return lid;
     } catch (e) {
-        console.error("Erreur lors de la récupération des métadonnées du groupe :", e.message);
+        console.error("Erreur dans JidToLid:", e.message);
         return null;
     }
 }
 
-module.exports = getMetadata;
+module.exports = JidToLid;
