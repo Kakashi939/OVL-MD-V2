@@ -49,10 +49,9 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         const { auteur_Msg_Repondu, auteur_Message, arg, ms, JidToLid } = cmd_options;
-        const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-        const tags = await JidToLid(cibl);
-      console.log(arg[0]);
-         if (tags.length === 0) {
+        const tags = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`);
+     
+       if (tags.length === 0) {
             return await ovl.sendMessage(ms_org, { text: "Mentionne une personne" }, { quoted: ms });
          }
         const randomPercentage = Math.floor(Math.random() * 101);
@@ -231,8 +230,7 @@ ovlcmd(
     async (ms_org, ovl, cmd_options) => {
         const { arg, auteur_Message, auteur_Msg_Repondu, ms, JidToLid } = cmd_options;
          
-        const cibl = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu || auteur_Message;
-        const userId = await JidToLid(cibl);
+        const userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`) || auteur_Msg_Repondu || auteur_Message;
 
         let pp;
         try {
