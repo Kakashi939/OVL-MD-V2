@@ -1,4 +1,4 @@
-const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot, getMetadata } = require('./Message_upsert_events');
+const { rankAndLevelUp, lecture_status, like_status, presence, dl_status, antivv, antidelete, antitag, antilink, antibot, getLid } = require('./Message_upsert_events');
 const { Bans } = require("../DataBase/ban");
 const { Sudo } = require('../DataBase/sudo');
 const { getMessage, addMessage } = require('../lib/store');
@@ -22,18 +22,16 @@ async function message_upsert(m, ovl) {
         }
         return jid;
     };
-    async function lidToJid(lidParticipant, j) {
-    try {
-        if (!lidParticipant) return null;
-        const metadata = await getMetadata(ovl, j);
-        if (!metadata) return null;
-        const membre = metadata.participants.find(p => p?.lid === lidParticipant);
-        console.log(membre?.id);
-        return membre?.id || null;
-    } catch (e) {
-        console.error("Erreur lors de la conversion du LID participant en JID :", e.message);
-        return null;
-    }
+
+    async function JidToLid(j) {
+        try {
+            if (!j) return null;
+            const lid = await getLid(j);
+            return lid || j;
+        } catch (e) {
+            console.error("Erreur lors de la conversion du JID en LID :", e.message);
+            return j;
+        }
     }
 
     const mtype = getContentType(ms.message);
@@ -49,7 +47,7 @@ async function message_upsert(m, ovl) {
     }[mtype] || "";
 
     const ms_org = ms.key.remoteJid;
-    const id_Bot = decodeJid(ovl.user.id);
+    const id_Bot = await JidToLid(decodeJid(ovl.user.id));
     const id_Bot_N = id_Bot.split('@')[0];
 
     const isGroup = ms_org.endsWith("@g.us");
@@ -60,10 +58,10 @@ async function message_upsert(m, ovl) {
     const isBotAdmin = isGroup && admins.includes(id_Bot);
 
     const msgReply = ms.message.extendedTextMessage?.contextInfo?.quotedMessage;
-    const replyAuthor = await lidToJid(ms.message.extendedTextMessage?.contextInfo?.participant, ms_org);
+    const replyAuthor = await JidToLid(decodeJid(ms.message.extendedTextMessage?.contextInfo?.participant));
     const mentioned = ms.message.extendedTextMessage?.contextInfo?.mentionedJid;
 
-    const sender = isGroup ? await lidToJid(ms.key.participant, ms_org) : decodeJid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
+    const sender = isGroup ? await JidToLid(ms.key.participant) : await JidToLid(ms.key.fromMe ? id_Bot : ms.key.remoteJid);
     const senderName = ms.pushName;
 
     const arg = texte.trim().split(/ +/).slice(1);
@@ -85,12 +83,15 @@ async function message_upsert(m, ovl) {
     }
 
     const sudoUsers = await getSudoUsers();
-    const premiumUsers = [Ainz, Ainzbot, id_Bot_N, config.NUMERO_OWNER, ...sudoUsers]
+
+    const premiumUsersRaw = [Ainz, Ainzbot, id_Bot_N, config.NUMERO_OWNER, ...sudoUsers]
         .map(n => `${n.replace(/[^0-9]/g, "")}@s.whatsapp.net`);
+
+    const premiumUsers = await Promise.all(premiumUsersRaw.map(j => JidToLid(j)));
     const isPremium = premiumUsers.includes(sender);
 
-    const devJids = devNumbers.map(n => `${n.replace(/[^0-9]/g, "")}@s.whatsapp.net`);
-    const isDev = devJids.includes(sender);
+    const devLids = await Promise.all(devNumbers.map(n => JidToLid(`${n}@s.whatsapp.net`)));
+    const isDev = devLids.includes(sender);
 
     const isAdmin = isGroup && (admins.includes(sender) || isPremium);
 
@@ -108,7 +109,7 @@ async function message_upsert(m, ovl) {
         id_Bot,
         prenium_id: isPremium,
         dev_id: isDev,
-        dev_num: devJids,
+        dev_num: devLids,
         id_Bot_N,
         verif_Ovl_Admin: isBotAdmin,
         prefixe,
@@ -143,7 +144,7 @@ async function message_upsert(m, ovl) {
         if (cd) {
             try {
                 if (config.MODE !== 'public' && !isPremium) return;
-                if ((!isDev && sender !== '221772430620@s.whatsapp.net') && ms_org === "120363314687943170@g.us") return;
+                if ((!isDev && sender !== await JidToLid('221772430620@s.whatsapp.net')) && ms_org === "120363314687943170@g.us") return;
                 if (!isPremium && await isBanned('user', sender)) return;
                 if (!isPremium && isGroup && await isBanned('group', ms_org)) return;
 
