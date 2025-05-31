@@ -532,6 +532,43 @@ ovlcmd(
 
 ovlcmd(
   {
+    nom_cmd: "don",
+    classe: "OVL-ECON--y",
+    react: "🤝",
+    desc: "Permet à un Premium de donner des pièces à un autre utilisateur"
+  },
+  async (ms_org, ovl, { arg, auteur_Message, repondre, JidToLid, prenium_id, dev_id }) => {
+    const utilisateur = await getInfosUtilisateur(auteur_Message);
+    if (!prenium_id) {
+      return repondre("Cette commande est réservée aux utilisateurs Premium.");
+    }
+
+    const cibl = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
+
+    const destinataire = JidToLid(cibl);
+    if (!destinataire) return repondre("Mentionne la personne à qui tu veux donner de l'argent.");
+
+    const montant = parseInt(arg[1]);
+    if (!montant || montant <= 0) return repondre("Montant invalide.");
+
+    const limite = 50000;
+    if (montant > limite && !dev_id) {
+      return repondre(`Tu ne peux pas donner plus de *${limite} pièces*.`);
+    }
+
+    const destinataireExiste = await ECONOMIE.findOne({ where: { id: destinataire } });
+    if (!destinataireExiste) {
+      return repondre("L'utilisateur mentionné n'est pas enregistré dans le système.");
+    }
+
+    await modifierSolde(destinataire, "portefeuille", montant);
+
+    repondre(`✅ Tu as donné *${montant} pièces* à @${destinataire.split("@")[0]} 💸`);
+  }
+);
+
+ovlcmd(
+  {
     nom_cmd: "topecon",
     classe: "OVL-ECON--y",
     react: "🏦",
