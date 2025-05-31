@@ -617,7 +617,7 @@ ovlcmd(
   }
 );
 
-/*ovlcmd(
+ovlcmd(
     {
         nom_cmd: "restart",
         classe: "Système",
@@ -797,4 +797,4 @@ ovlcmd(
       await ovl.sendMessage(ms_org, { text: `❌ Erreur lors de la suppression de la session : ${err.message}` }, { quoted: ms });
     }
   }
-);*/
+);
