@@ -18,14 +18,13 @@ ovlcmd(
     react: "💰",
     classe: "OVL-ECON--y"
   },
-  async (ms_org, ovl, { ms, arg, auteur_Message, auteur_Msg_Repondu, repondre, JidToLid }) => {
+  async (ms_org, ovl, { ms, arg, auteur_Message, auteur_Msg_Repondu, repondre }) => {
     try {
-      const cibl =
-        (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) ||
+      const userId =
+        (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`) ||
         auteur_Msg_Repondu ||
         auteur_Message;
-
-      const userId = await JidToLid(cibl);
+ 
       if (!userId) return await repondre("❌ Impossible de trouver l'utilisateur.");
 
       let pp = 'https://files.catbox.moe/ulwqtr.jpg';
@@ -70,15 +69,14 @@ ovlcmd(
     classe: "OVL-ECON--y"
   },
   async (ms_org, ovl, cmd) => {
-    const { ms, arg, auteur_Message, repondre, JidToLid } = cmd;
+    const { ms, arg, auteur_Message, repondre } = cmd;
 
     if (arg.length < 2) {
       return repondre("Usage : transfer @utilisateur montant");
     }
 
-    const cibl = arg[0].includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
-    const destinataireId = await JidToLid(cibl);
-
+    const destinataireId = arg[0].includes("@") ? `${arg[0].replace("@", "")}@lid` : null;
+    
     if (!destinataireId) {
       return repondre("Merci de mentionner un utilisateur valide (@numéro).");
     }
@@ -139,13 +137,13 @@ ovlcmd(
     react: "♻️",
     desc: "Réinitialise le compte économie d'un utilisateur"
   },
-  async (ms_org, ovl, { arg, prenium_id, auteur_Msg_Repondu, JidToLid }) => {
+  async (ms_org, ovl, { arg, prenium_id, auteur_Msg_Repondu }) => {
     if (!prenium_id) {
       return repondre("Vous n'avez pas l'autorisation d'exécuter cette commande.");
     }
 
-    const cibl = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu;
-    const cible = await JidToLid(cibl);
+    const cible = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@lid`) || auteur_Msg_Repondu;
+    
     if (!cible) {
       repondre("Veuillez mentionner un utilisateur ou répondre à son message.");
         
@@ -295,10 +293,9 @@ ovlcmd(
     react: "🕶️",
     classe: "OVL-ECON--y"
   },
-  async (ms_org, ovl, { repondre, auteur_Message, arg, JidToLid }) => {
-    const cibl = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
+  async (ms_org, ovl, { repondre, auteur_Message, arg }) => {
+    const victimeId = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@lid` : null;
 
-    const victimeId = await JidToLid(cibl);
     if (!victimeId) return repondre("Mentionne un utilisateur valide à voler.");
 
     if (victimeId === auteur_Message) return repondre("Tu ne peux pas te voler toi-même, voleur paresseux 😒.");
@@ -537,15 +534,14 @@ ovlcmd(
     react: "🤝",
     desc: "Permet à un Premium de donner des pièces à un autre utilisateur"
   },
-  async (ms_org, ovl, { arg, auteur_Message, repondre, JidToLid, prenium_id, dev_id }) => {
+  async (ms_org, ovl, { arg, auteur_Message, repondre, prenium_id, dev_id }) => {
     const utilisateur = await getInfosUtilisateur(auteur_Message);
     if (!prenium_id) {
       return repondre("Cette commande est réservée aux utilisateurs Premium.");
     }
 
-    const cibl = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
-
-    const destinataire = await JidToLid(cibl);
+    const destinataire = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@lid` : null;
+ 
     if (!destinataire) return repondre("Mentionne la personne à qui tu veux donner de l'argent.");
 
     const montant = parseInt(arg[1]);
