@@ -696,7 +696,7 @@ ovlcmd(
 
 ovlcmd(
   {
-    nom_cmd: "delete_session",
+    nom_cmd: "disconnect",
     classe: "Owner",
     desc: "Supprime une session connectée par numéro",
   },
