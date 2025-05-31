@@ -25,7 +25,7 @@ ovlcmd(
         auteur_Msg_Repondu ||
         auteur_Message;
 
-      const userId = JidToLid(cibl);
+      const userId = await JidToLid(cibl);
       if (!userId) return await repondre("❌ Impossible de trouver l'utilisateur.");
 
       let pp = 'https://files.catbox.moe/ulwqtr.jpg';
@@ -77,7 +77,7 @@ ovlcmd(
     }
 
     const cibl = arg[0].includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
-    const destinataireId = JidToLid(cibl);
+    const destinataireId = await JidToLid(cibl);
 
     if (!destinataireId) {
       return repondre("Merci de mentionner un utilisateur valide (@numéro).");
@@ -145,7 +145,7 @@ ovlcmd(
     }
 
     const cibl = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu;
-    const cible = JidToLid(cibl);
+    const cible = await JidToLid(cibl);
     if (!cible) {
       repondre("Veuillez mentionner un utilisateur ou répondre à son message.");
         
@@ -298,7 +298,7 @@ ovlcmd(
   async (ms_org, ovl, { repondre, auteur_Message, arg, JidToLid }) => {
     const cibl = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
 
-    const victimeId = JidToLid(cibl);
+    const victimeId = await JidToLid(cibl);
     if (!victimeId) return repondre("Mentionne un utilisateur valide à voler.");
 
     if (victimeId === auteur_Message) return repondre("Tu ne peux pas te voler toi-même, voleur paresseux 😒.");
@@ -545,7 +545,7 @@ ovlcmd(
 
     const cibl = arg[0]?.includes("@") ? `${arg[0].replace("@", "")}@s.whatsapp.net` : null;
 
-    const destinataire = JidToLid(cibl);
+    const destinataire = await JidToLid(cibl);
     if (!destinataire) return repondre("Mentionne la personne à qui tu veux donner de l'argent.");
 
     const montant = parseInt(arg[1]);
