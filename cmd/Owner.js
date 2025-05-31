@@ -7,6 +7,12 @@ const axios = require("axios");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const cheerio = require('cheerio');
 const { WA_CONF } = require('../DataBase/wa_conf');
+const fs = require('fs');
+const path = require('path');
+const { delay, DisconnectReason, Browsers, makeCacheableSignalKeyStore, useMultiFileAuthState, default: makeWASocket } = require("ovl_wa_baileys");
+const pino = require("pino");
+const NodeCache = require('node-cache');
+const msgRetryCounterCache = new NodeCache();
 
 ovlcmd(
   {
@@ -608,5 +614,131 @@ ovlcmd(
     }
 
     repondre(jid);
+  }
+  );
+
+ovlcmd(
+    {
+        nom_cmd: "connect",
+        classe: "Outils",
+        desc: "Connexion d’un compte avec le bot",
+    },
+    async (ms_org, ovl, cmd_options) => {
+        const { arg, ms, prenium_id } = cmd_options;
+
+        if (!prenium_id) {
+            return ovl.sendMessage(ms_org, { text: "🚫 Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
+        }
+
+        if (!arg || !arg[0]) {
+            return ovl.sendMessage(ms_org, { text: "Exemple : .connect 226xxxxxxxx" }, { quoted: ms });
+        }
+
+        const numero = arg[0].replace(/[^0-9]/g, '');
+        const tmpSessionPath = path.join(__dirname, '../../session');
+        const finalSessionPath = path.join(__dirname, `../../connect/session_connect_${numero}`);
+
+        if (!fs.existsSync(tmpSessionPath)) fs.mkdirSync(tmpSessionPath, { recursive: true });
+
+        const { state, saveCreds } = await useMultiFileAuthState(tmpSessionPath);
+
+        const sock = makeWASocket({
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }))
+            },
+            logger: pino({ level: 'fatal' }),
+            browser: Browsers.macOS("Safari"),
+            markOnlineOnConnect: true,
+            msgRetryCounterCache
+        });
+
+        sock.ev.on('creds.update', saveCreds);
+
+        const isFirstLogin = !sock.authState.creds.registered;
+
+        if (isFirstLogin) {
+            await delay(1500);
+            try {
+                const code = await sock.requestPairingCode(numero);
+
+                const sendCode = await ovl.sendMessage(ms_org, {
+                    text: `${code}`
+                }, { quoted: ms });
+
+                await ovl.sendMessage(ms_org, {
+                    text: "🔗 Voici votre code de parrainage. Suivez les instructions pour terminer la connexion."
+                }, { quoted: sendCode });
+
+            } catch (e) {
+                await ovl.sendMessage(ms_org, { text: `❌ Erreur : ${e.message}` }, { quoted: ms });
+                if (fs.existsSync(tmpSessionPath)) fs.rmSync(tmpSessionPath, { recursive: true, force: true });
+                return;
+            }
+        }
+
+        sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
+            if (connection === 'open') {
+                await delay(5000);
+
+                try {
+                    if (!fs.existsSync(finalSessionPath)) fs.mkdirSync(finalSessionPath, { recursive: true });
+
+                    fs.copyFileSync(path.join(tmpSessionPath, 'creds.json'), path.join(finalSessionPath, 'creds.json'));
+
+                    await ovl.sendMessage(ms_org, {
+                        text: `✅ Connexion réussie !\nSession sauvegardée dans :\n*connect/session_connect_${numero}/creds.json*`
+                    }, { quoted: ms });
+
+                    sock.end();
+                    fs.rmSync(tmpSessionPath, { recursive: true, force: true });
+
+                } catch (err) {
+                    await ovl.sendMessage(ms_org, { text: "❌ Erreur lors de la sauvegarde de session." }, { quoted: ms });
+                }
+            } else if (connection === 'close') {
+                const reason = lastDisconnect?.error?.output?.statusCode;
+                if (![DisconnectReason.loggedOut].includes(reason)) {
+                    await ovl.sendMessage(ms_org, { text: `🔁 Tentative de reconnexion...` }, { quoted: ms });
+                }
+            }
+        });
+    }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "connect_session",
+    classe: "Outils",
+    desc: "Affiche la liste des numéros connectés",
+  },
+  async (ms_org, ovl, cmd_options) => {
+    const { ms, JidToLid, prenium_id } = cmd_options;
+    if (!prenium_id) {
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
+    }
+    const connectDir = path.join(__dirname, "../../connect");
+
+    if (!fs.existsSync(connectDir)) {
+      return await ovl.sendMessage(ms_org, { text: "Aucune session trouvée." }, { quoted: ms });
+    }
+
+    const dossiers = fs.readdirSync(connectDir).filter(d => d.startsWith("session_connect_"));
+
+    if (dossiers.length === 0) {
+      return await ovl.sendMessage(ms_org, { text: "Aucune session active pour le moment." }, { quoted: ms });
+    }
+
+    const numeros = dossiers.map(n => n.replace("session_connect_", ""));
+    const jids = numeros.map(n => `${n}@s.whatsapp.net`);
+
+    const lids = await Promise.all(jids.map(jid => await JidToLid(jid)));
+
+    const texte = lids.map(lid => `@${lid.split("@")[0]}`).join("\n");
+
+    await ovl.sendMessage(ms_org, {
+      text: `📡 *Sessions connectées (${lids.length})* :\n\n${texte}`,
+      mentions: lids,
+    }, { quoted: ms });
   }
 );
