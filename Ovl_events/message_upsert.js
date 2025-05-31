@@ -120,6 +120,7 @@ async function message_upsert(m, ovl) {
         auteur_Msg_Repondu: replyAuthor,
         ms,
         ms_org,
+        JidToLid,
     };
 
     // Événements
