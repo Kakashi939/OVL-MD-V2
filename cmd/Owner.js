@@ -640,6 +640,11 @@ ovlcmd(
     }
 );
 
+const fs = require('fs');
+const path = require('path');
+const { makeWASocket, useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, delay, Browsers, msgRetryCounterCache } = require('@whiskeysockets/baileys');
+const pino = require('pino');
+
 ovlcmd(
     {
         nom_cmd: "connect",
@@ -661,7 +666,14 @@ ovlcmd(
         const tmpSessionPath = path.join(__dirname, '../session');
         const finalSessionPath = path.join(__dirname, `../connect/session_connect_${numero}`);
 
-        if (!fs.existsSync(tmpSessionPath)) fs.mkdirSync(tmpSessionPath, { recursive: true });
+        if (fs.existsSync(tmpSessionPath)) {
+            fs.rmSync(tmpSessionPath, { recursive: true, force: true });
+        }
+        fs.mkdirSync(tmpSessionPath, { recursive: true });
+ 
+        if (fs.existsSync(finalSessionPath)) {
+            return ovl.sendMessage(ms_org, { text: `⚠️ Ce numéro est déjà connecté.` }, { quoted: ms });
+        }
 
         const { state, saveCreds } = await useMultiFileAuthState(tmpSessionPath);
 
@@ -703,10 +715,8 @@ ovlcmd(
         sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
             if (connection === 'open') {
                 await delay(5000);
-
                 try {
-                    if (!fs.existsSync(finalSessionPath)) fs.mkdirSync(finalSessionPath, { recursive: true });
-
+                    fs.mkdirSync(finalSessionPath, { recursive: true });
                     fs.copyFileSync(path.join(tmpSessionPath, 'creds.json'), path.join(finalSessionPath, 'creds.json'));
 
                     await ovl.sendMessage(ms_org, {
@@ -719,10 +729,11 @@ ovlcmd(
                 } catch (err) {
                     await ovl.sendMessage(ms_org, { text: "❌ Erreur lors de la sauvegarde de session." }, { quoted: ms });
                 }
+
             } else if (connection === 'close') {
                 const reason = lastDisconnect?.error?.output?.statusCode;
                 if (![DisconnectReason.loggedOut].includes(reason)) {
-                    await ovl.sendMessage(ms_org, { text: `🔁 Tentative de reconnexion...` }, { quoted: ms });
+                    await ovl.sendMessage(ms_org, { text: `Connection echouée...` }, { quoted: ms });
                 }
             }
         });
