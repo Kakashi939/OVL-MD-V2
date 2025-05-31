@@ -1,6 +1,6 @@
 const groupCache = new Map();
 
-async function JidToLid(jid, ovl) {
+async function getLid(jid, ovl) {
     try {
         if (!jid || typeof jid !== "string") return null;
         if (jid.endsWith("@lid")) return jid;
@@ -18,4 +18,4 @@ async function JidToLid(jid, ovl) {
     }
 }
 
-module.exports = JidToLid;
+module.exports = getLid;
