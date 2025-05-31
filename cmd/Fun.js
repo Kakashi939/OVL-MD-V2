@@ -48,8 +48,9 @@ ovlcmd(
         alias: ["match"],
     },
     async (ms_org, ovl, cmd_options) => {
-        const { auteur_Msg_Repondu, auteur_Message, arg, ms } = cmd_options;
-        const tags = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+        const { auteur_Msg_Repondu, auteur_Message, arg, ms, JidToLid } = cmd_options;
+        const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+        const tags = JidToLid(cibl);
          if (tags.length === 0) {
             return await ovl.sendMessage(ms_org, { text: "Mentionne une personne" }, { quoted: ms });
          }
@@ -229,7 +230,8 @@ ovlcmd(
     async (ms_org, ovl, cmd_options) => {
         const { arg, auteur_Message, auteur_Msg_Repondu, ms } = cmd_options;
          
-        const userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu || auteur_Message;
+        const cibl = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu || auteur_Message;
+        const userId = JidToLid(cibl);
 
         let pp;
         try {
