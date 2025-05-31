@@ -43,7 +43,6 @@ async function main() {
     try {
         
         const ovl = makeWASocket({
-            printQRInTerminal: true,
             logger: pino({ level: "silent" }),
             browser: Browsers.macOS("Safari"),
             generateHighQualityLinkPreview: true,
