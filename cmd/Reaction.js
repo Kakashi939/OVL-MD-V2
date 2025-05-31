@@ -186,7 +186,8 @@ function addReactionCommand(nom_cmd, url) {
         },
         async (ms_org, ovl, cmd_options) => {
             const { arg, auteur_Message, auteur_Msg_Repondu, repondre, ms } = cmd_options;
-            const cible = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+            const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
+            const cible = JidToLid(cibl);
 
             try {
                 const response = await axios.get(url);
