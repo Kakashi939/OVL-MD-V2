@@ -85,7 +85,7 @@ ovlcmd(
         auteur_Msg_Repondu || 
         (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
 
-      const cible = JidToLid(cibl);
+      const cible = await JidToLid(cibl);
       if (!cible) return repondre("Mentionnez un utilisateur valide à bannir.");
 
       if (dev_num.includes(cible)) {
@@ -126,7 +126,7 @@ ovlcmd(
         auteur_Msg_Repondu || 
         (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
 
-      const cible = JidToLid(cibl);
+      const cible = await JidToLid(cibl);
       if (!cible) return repondre("Mentionnez un utilisateur valide à débannir.");
 
       const suppression = await Bans.destroy({ where: { id: cible, type: "user" } });
@@ -223,7 +223,7 @@ ovlcmd(
       auteur_Msg_Repondu ||
       (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
 
-    const cible = JidToLid(cibl);
+    const cible = await JidToLid(cibl);
     if (!cible) {
       return repondre("Veuillez mentionner un utilisateur valide pour l'ajouter en premium.");
     }
@@ -303,7 +303,7 @@ ovlcmd(
     const cibl =
       auteur_Msg_Repondu ||
       (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
-    const cible = JidToLid(cibl);
+    const cible = await JidToLid(cibl);
 
     if (!cible) {
       return repondre("Veuillez mentionner un utilisateur");
