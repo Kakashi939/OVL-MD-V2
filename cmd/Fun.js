@@ -51,6 +51,7 @@ ovlcmd(
         const { auteur_Msg_Repondu, auteur_Message, arg, ms, JidToLid } = cmd_options;
         const cibl = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
         const tags = await JidToLid(cibl);
+      console.log(arg[0]);
          if (tags.length === 0) {
             return await ovl.sendMessage(ms_org, { text: "Mentionne une personne" }, { quoted: ms });
          }
