@@ -610,12 +610,12 @@ ovlcmd(
     if (!msg_Repondu) {
       jid = ms_org;
     } else {
-      jid = auteur_Msg_Repondu
+      jid = auteur_Msg_Repondu;
     }
 
     repondre(jid);
   }
-  );
+);
 
 ovlcmd(
     {
