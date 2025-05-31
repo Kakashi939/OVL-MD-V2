@@ -534,7 +534,7 @@ ovlcmd(
     react: "🤝",
     desc: "Permet à un Premium de donner des pièces à un autre utilisateur"
   },
-  async (ms_org, ovl, { arg, auteur_Message, repondre, prenium_id, dev_id }) => {
+  async (ms_org, ovl, { arg, auteur_Message, ms, repondre, prenium_id, dev_id }) => {
     const utilisateur = await getInfosUtilisateur(auteur_Message);
     if (!prenium_id) {
       return repondre("Cette commande est réservée aux utilisateurs Premium.");
@@ -559,7 +559,10 @@ ovlcmd(
 
     await modifierSolde(destinataire, "portefeuille", montant);
 
-    repondre(`✅ Tu as donné *${montant} pièces* à @${destinataire.split("@")[0]} 💸`);
+    await ovl.sendMessage(ms_org, {
+            text: `✅ Tu as donné *${montant} pièces* à @${destinataire.split("@")[0]} 💸`,
+            mentions: [destinataire],
+        }, { quoted: ms });
   }
 );
 
