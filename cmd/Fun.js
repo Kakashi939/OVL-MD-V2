@@ -228,7 +228,7 @@ ovlcmd(
         desc: "Affiche le rang d'un utilisateur selon ses messages envoyés et gère l'activation/désactivation globale du level up."
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg, auteur_Message, auteur_Msg_Repondu, ms } = cmd_options;
+        const { arg, auteur_Message, auteur_Msg_Repondu, ms, JidToLid } = cmd_options;
          
         const cibl = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu || auteur_Message;
         const userId = await JidToLid(cibl);
