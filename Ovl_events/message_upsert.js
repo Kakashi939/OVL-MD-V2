@@ -23,10 +23,10 @@ async function message_upsert(m, ovl) {
         return jid;
     };
 
-    async function JidToLid(j, ovl) {
+    async function JidToLid(j) {
         try {
             if (!j) return null;
-            const lid = await getLid(j);
+            const lid = await getLid(j, ovl);
             return lid || j;
         } catch (e) {
             console.error("Erreur lors de la conversion du JID en LID :", e.message);
