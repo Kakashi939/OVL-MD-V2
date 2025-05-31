@@ -7,6 +7,7 @@ const axios = require("axios");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const cheerio = require('cheerio');
 const { WA_CONF } = require('../DataBase/wa_conf');
+const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { delay, DisconnectReason, Browsers, makeCacheableSignalKeyStore, useMultiFileAuthState, default: makeWASocket } = require("ovl_wa_baileys");
@@ -616,6 +617,29 @@ ovlcmd(
     repondre(jid);
   }
   );
+
+ovlcmd(
+    {
+        nom_cmd: "restart",
+        classe: "Système",
+        desc: "Redémarre le bot via PM2"
+    },
+    async (ms_org, ovl, opt) => {
+        const { ms, prenium_id } = opt;
+
+        if (!prenium_id) {
+            return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." }, { quoted: ms });
+        }
+
+        await ovl.sendMessage(ms_org, { text: "♻️ Redémarrage du bot en cours..." }, { quoted: ms });
+
+        exec('pm2 restart all', (err, stdout, stderr) => {
+            if (err) {
+                return ovl.sendMessage(ms_org, { text: `Erreur lors du redémarrage :\n${err.message}` }, { quoted: ms });
+            }
+        });
+    }
+);
 
 ovlcmd(
     {
