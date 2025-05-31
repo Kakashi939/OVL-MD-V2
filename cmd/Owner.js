@@ -7,7 +7,6 @@ const axios = require("axios");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const cheerio = require('cheerio');
 const { WA_CONF } = require('../DataBase/wa_conf');
-const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { delay, DisconnectReason, Browsers, makeCacheableSignalKeyStore, useMultiFileAuthState, default: makeWASocket } = require("ovl_wa_baileys");
