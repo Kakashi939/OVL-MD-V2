@@ -794,6 +794,7 @@ ovlcmd(
       await ovl.groupRequestParticipantsUpdate(jid, "approve");
       ovl.sendMessage(jid, { text: "Toutes les demandes ont été acceptées." }, { quoted: cmd_options.ms });
     } catch (err) {
+        console.error(err);
       ovl.sendMessage(jid, { text: "Une erreur est survenue lors de l'acceptation des demandes." }, { quoted: cmd_options.ms });
     }
   }
@@ -816,6 +817,7 @@ ovlcmd(
       await ovl.groupRequestParticipantsUpdate(jid, "reject");
       ovl.sendMessage(jid, { text: "Toutes les demandes ont été rejetées." }, { quoted: cmd_options.ms });
     } catch (err) {
+        console.error(err);
       ovl.sendMessage(jid, { text: "Une erreur est survenue lors du rejet des demandes." }, { quoted: cmd_options.ms });
     }
   }
