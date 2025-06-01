@@ -718,6 +718,12 @@ ovlcmd(
     const numero = arg[0].replace(/[^0-9]/g, '');
     const result = await deleteSession(numero);
 
+    exec('pm2 restart all', (err) => {
+          if (err) {
+            ovl.sendMessage(ms_org, { text: `⚠️ Erreur lors du redémarrage :\n${err.message}` }, { quoted: ms });
+          }
+        });
+
     if (result === 0) {
       return ovl.sendMessage(ms_org, {
         text: `Aucune session trouvée pour le numéro : ${numero}`,
