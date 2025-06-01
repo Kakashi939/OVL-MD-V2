@@ -780,13 +780,8 @@ ovlcmd(
     const { verif_Groupe, repondre, auteur_msg, ms } = cmd_options;
 
     const inviteLink = 'https://chat.whatsapp.com/HzhikAmOuYhFXGLmcyMo62';
-    const message = `📩 *OVL-MD SUPPORT*\nVoici le lien pour rejoindre le groupe:\n${inviteLink}`;
+    const message = `📩 *OVL-MD-V2 SUPPORT*\nVoici le lien pour rejoindre le groupe:\n${inviteLink}`;
 
-    if (verif_Groupe) {
-      await repondre("📩 Le lien d'invitation a été envoyé en message privé.");
-      await ovl.sendMessage(auteur_msg, { text: message }, { quoted: ms });
-    } else {
-      await ovl.sendMessage(ms_org, { text: message }, { quoted: ms });
-    }
+    await ovl.sendMessage(ms_org, { text: message }, { quoted: ms });
   }
 );
