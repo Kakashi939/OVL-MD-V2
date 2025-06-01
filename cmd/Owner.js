@@ -674,21 +674,21 @@ ovlcmd(
       }, { quoted: ms });
     }
 
-    const numeros = await getAllSessions();
+    const tous = await getAllSessions();
+    const numeros = tous.filter(id => id !== "principale");
 
     if (!numeros || numeros.length === 0) {
       return ovl.sendMessage(ms_org, {
-        text: "📭 Aucune session active pour le moment.",
+        text: "📭 Aucune session secondaire active pour le moment.",
       }, { quoted: ms });
     }
 
     const jids = numeros.map(n => `${n}@s.whatsapp.net`);
     const lids = await Promise.all(jids.map(jid => JidToLid(jid)));
-
     const texte = lids.map(lid => `@${lid.split("@")[0]}`).join("\n");
 
     await ovl.sendMessage(ms_org, {
-      text: `📡 *Sessions connectées (${lids.length})* :\n\n${texte}`,
+      text: `📡 *Sessions secondaires connectées (${lids.length})* :\n\n${texte}`,
       mentions: lids,
     }, { quoted: ms });
   }
