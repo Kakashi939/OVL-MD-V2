@@ -617,7 +617,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "restart",
-        classe: "Système",
+        classe: "Owner",
         desc: "Redémarre le bot via PM2"
     },
     async (ms_org, ovl, opt) => {
