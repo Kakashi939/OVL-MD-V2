@@ -60,17 +60,9 @@ async function deleteSession(id) {
   return await SESSION_WA.destroy({ where: { id } });
 }
 
-async function updateCreds(id, newCreds) {
-  const session = await SESSION_WA.findByPk(id);
-  if (!session) return null;
-  session.creds = newCreds;
-  return await session.save();
-}
-
 module.exports = {
   saveSession,
   getSession,
   getAllSessions,
-  deleteSession,
-  updateCreds
+  deleteSession
 };
