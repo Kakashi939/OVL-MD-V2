@@ -35,10 +35,7 @@ async function Start_ovl_md_v2() {
       browser: Browsers.macOS("Safari"),
       generateHighQualityLinkPreview: true,
       syncFullHistory: false,
-      auth: {
-        creds,
-        keys: makeCacheableSignalKeyStore({}, pino({ level: "silent" }))
-      }
+      auth: creds
     });
 
     ovl.ev.on("messages.upsert", async (m) => { message_upsert(m, ovl); });
