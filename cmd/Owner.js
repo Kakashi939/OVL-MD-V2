@@ -10,7 +10,8 @@ const cheerio = require('cheerio');
 const { WA_CONF } = require('../DataBase/wa_conf');
 const path = require('path');
 const { deleteSession, getAllSessions } = require("../DataBase/connect");
-
+const  { setMention, delMention, getMention } = require("../DataBase/mention");
+  
 ovlcmd(
   {
     nom_cmd: "exec",
@@ -735,3 +736,163 @@ ovlcmd(
     }, { quoted: ms });
   }
 );
+
+ovlcmd(
+  {
+    nom_cmd: "setmention",
+    classe: "Owner",
+    react: "✅",
+    desc: "Configurer le message d'antimention global",
+  },
+  async (jid, ovl, cmd_options) => {
+    const { ms, repondre, arg, prenium_id } = cmd_options;
+
+    if (!prenium_id) return repondre("❌ Seuls les utilisateurs premium peuvent utiliser cette commande.");
+
+    try {
+      const joined = arg.join(" ");
+      if (!joined) {
+        return repondre(
+          `🛠️ Utilisation de la commande *setmention* :
+
+1️⃣ Pour une image ou vidéo avec texte :
+> *setmention url=https://exemple.com/fichier.jpg & text=Votre message ici*
+
+2️⃣ Pour un audio (.opus uniquement) :
+> *setmention url=https://exemple.com/audio.opus*
+
+3️⃣ Pour un message texte seulement (pas de média) :
+> *setmention text=Votre message ici*
+
+📌 Extensions supportées : .jpg, .jpeg, .png, .mp4, .opus
+⚠️ Le texte n’est pas autorisé avec l'audio.
+✅Veuillez utuliser la commande *url* pour obtenir l'URL.`
+        );
+      }
+
+      const parts = joined.split("&").map(p => p.trim());
+      let url = "url";
+      let text = "text";
+
+      for (const part of parts) {
+        if (part.startsWith("url=")) url = part.replace("url=", "").trim();
+        else if (part.startsWith("text=")) text = part.replace("text=", "").trim();
+      }
+
+      const lowerUrl = url.toLowerCase();
+
+      const isAudio = lowerUrl.endsWith(".opus");
+      const isImage = lowerUrl.endsWith(".jpg") || lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".png");
+      const isVideo = lowerUrl.endsWith(".mp4");
+
+      if (url === "url" && text !== "text") {
+        await setMention({ url: "", text, mode: "oui" });
+        return repondre("✅ Message texte configuré avec succès pour l'antimention.");
+      }
+
+      if (isAudio) {
+        if (text !== "text" && text !== "") return repondre("❌ Le texte n'est pas autorisé pour un message audio (.opus).");
+        await setMention({ url, text: "", mode: "oui" });
+        return repondre("✅ Mention audio enregistrée.");
+      }
+
+      if (isImage || isVideo) {
+        await setMention({ url, text, mode: "oui" });
+        return repondre(`✅ Mention ${isImage ? "image" : "vidéo"} enregistrée avec succès.`);
+      }
+
+      return repondre("Format de fichier non supporté. Extensions valides : .jpg, .jpeg, .png, .mp4, .opus");
+    } catch (e) {
+      console.error("Erreur dans setmention:", e);
+      repondre("Une erreur s'est produite lors de la configuration.");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "delmention",
+    classe: "Owner",
+    react: "🚫",
+    desc: "Désactiver le système d'antimention",
+  },
+  async (jid, ovl, cmd_options) => {
+    const { repondre, prenium_id } = cmd_options;
+
+    if (!prenium_id) return repondre("Seuls les utilisateurs premium peuvent utiliser cette commande.");
+
+    try {
+      await delMention();
+      return repondre("✅ mention désactivé.");
+    } catch (e) {
+      console.error("Erreur dans delmention:", e);
+      repondre("Une erreur s'est produite.");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "gmention",
+    classe: "Owner",
+    react: "📄",
+    desc: "Afficher la configuration actuelle de l'antimention",
+  },
+  async (jid, ovl, cmd_options) => {
+    const { repondre, prenium_id } = cmd_options;
+
+    try {
+      if (!prenium_id) return repondre("Seuls les utilisateurs premium peuvent utiliser cette commande.");
+
+      const data = await getMention();
+
+      if (!data || data.mode === "non") {
+        return repondre("ℹ️ Antimention désactivé ou non configuré.");
+      }
+
+      const { mode, url, text } = data;
+
+      if (!url || url === "" || url === "url") {
+        if (!text || text === "text") {
+          return repondre("ℹ️ Antimention activé mais aucun contenu défini.");
+        }
+        return repondre(text);
+      }
+
+      const lowerUrl = url.toLowerCase();
+      const isAudio = lowerUrl.endsWith(".opus");
+      const isImage = lowerUrl.endsWith(".jpg") || lowerUrl.endsWith(".jpeg") || lowerUrl.endsWith(".png");
+      const isVideo = lowerUrl.endsWith(".mp4");
+
+      const type = isAudio ? "audio" : isImage ? "image" : isVideo ? "video" : "document";
+ 
+      if (isAudio) {
+        return await ovl.sendMessage(jid, {
+          audio: { url },
+          mimetype: 'audio/mp4',
+          ptt: true,
+        }, { quoted: null });
+      }
+
+      if (isImage) {
+        return await ovl.sendMessage(jid, {
+          image: { url },
+          caption: (text && text !== "text") ? text : undefined,
+        }, { quoted: null });
+      }
+
+      if (isVideo) {
+        return await ovl.sendMessage(jid, {
+          video: { url },
+          caption: (text && text !== "text") ? text : undefined,
+        }, { quoted: null });
+      }
+
+      return repondre("Le type de média est inconnu ou non pris en charge.");
+    } catch (e) {
+      console.error("Erreur dans gmention:", e);
+      repondre("Impossible d'afficher la configuration.");
+    }
+  }
+);
+
