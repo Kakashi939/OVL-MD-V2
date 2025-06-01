@@ -334,11 +334,7 @@ ovlcmd(
     if (!arg.length) {
       return ovl.sendMessage(ms_org, { text: "Veuillez fournir un terme de recherche pour le sticker !" }, { quoted: ms });
     }
-
-    if (cmd_options.verif_Groupe) {
-      ovl.sendMessage(ms_org, { text: "Pour éviter le spam, les stickers seront envoyés en privé. 📥" }, { quoted: ms });
-    }
-
+      
     const tenorApiKey = "AIzaSyCyouca1_KKy4W_MG1xsPzuku5oa8W358c";
     const searchTerm = encodeURIComponent(arg.join(" "));
 
@@ -365,7 +361,7 @@ ovlcmd(
         });
 
         const stickerBuffer = await sticker.toBuffer();
-        await ovl.sendMessage(auteur_Message, { sticker: stickerBuffer },  { quoted: ms });
+        await ovl.sendMessage(ms_org, { sticker: stickerBuffer },  { quoted: ms });
       }
     } catch (error) {
       console.error(error);
