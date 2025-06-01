@@ -9,6 +9,7 @@ const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const cheerio = require('cheerio');
 const { WA_CONF } = require('../DataBase/wa_conf');
 const path = require('path');
+const { deleteSession, getAllSessions } = require("../DataBase/connect");
 
 ovlcmd(
   {
@@ -666,25 +667,23 @@ ovlcmd(
   },
   async (ms_org, ovl, cmd_options) => {
     const { ms, JidToLid, prenium_id } = cmd_options;
+
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
-    }
-    const connectDir = path.join(__dirname, "../connect");
-
-    if (!fs.existsSync(connectDir)) {
-      return await ovl.sendMessage(ms_org, { text: "Aucune session trouvée." }, { quoted: ms });
+      return ovl.sendMessage(ms_org, {
+        text: "Vous n'avez pas le droit d'exécuter cette commande.",
+      }, { quoted: ms });
     }
 
-    const dossiers = fs.readdirSync(connectDir).filter(d => d.startsWith("session_connect_"));
+    const numeros = await getAllSessions();
 
-    if (dossiers.length === 0) {
-      return await ovl.sendMessage(ms_org, { text: "Aucune session active pour le moment." }, { quoted: ms });
+    if (!numeros || numeros.length === 0) {
+      return ovl.sendMessage(ms_org, {
+        text: "📭 Aucune session active pour le moment.",
+      }, { quoted: ms });
     }
 
-    const numeros = dossiers.map(n => n.replace("session_connect_", ""));
     const jids = numeros.map(n => `${n}@s.whatsapp.net`);
-
-    const lids = await Promise.all(jids.map(jid =>  JidToLid(jid)));
+    const lids = await Promise.all(jids.map(jid => JidToLid(jid)));
 
     const texte = lids.map(lid => `@${lid.split("@")[0]}`).join("\n");
 
@@ -705,25 +704,28 @@ ovlcmd(
     const { arg, ms, prenium_id } = cmd_options;
 
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
+      return ovl.sendMessage(ms_org, {
+        text: "Vous n'avez pas le droit d'exécuter cette commande.",
+      }, { quoted: ms });
     }
-    
+
     if (!arg || !arg[0]) {
-      return await ovl.sendMessage(ms_org, { text: "Usage : .delete_session 226xxxxxxxx" }, { quoted: ms });
+      return ovl.sendMessage(ms_org, {
+        text: "Usage : .disconnect 226xxxxxxxx",
+      }, { quoted: ms });
     }
 
     const numero = arg[0].replace(/[^0-9]/g, '');
-    const sessionPath = path.join(__dirname, `../connect/session_connect_${numero}`);
+    const result = await deleteSession(numero);
 
-    if (!fs.existsSync(sessionPath)) {
-      return await ovl.sendMessage(ms_org, { text: `❌ Aucune session trouvée pour le numéro : ${numero}` }, { quoted: ms });
+    if (result === 0) {
+      return ovl.sendMessage(ms_org, {
+        text: `Aucune session trouvée pour le numéro : ${numero}`,
+      }, { quoted: ms });
     }
 
-    try {
-      fs.rmSync(sessionPath, { recursive: true, force: true });
-      await ovl.sendMessage(ms_org, { text: `✅ Session pour le numéro ${numero} supprimée avec succès.` }, { quoted: ms });
-    } catch (err) {
-      await ovl.sendMessage(ms_org, { text: `❌ Erreur lors de la suppression de la session : ${err.message}` }, { quoted: ms });
-    }
+    await ovl.sendMessage(ms_org, {
+      text: `✅ Session pour le numéro ${numero} supprimée avec succès.`,
+    }, { quoted: ms });
   }
 );
