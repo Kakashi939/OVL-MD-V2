@@ -43,8 +43,8 @@ async function Start_ovl_md_v2() {
     ovl.ev.on("connection.update", async (con) => { connection_update(con, ovl, () => Start_ovl_md_v2()); });
 
     ovl.ev.on("creds.update", async updated => {
-      await saveSession(id, updated);
-    });
+     await updateCreds(id, updated);
+     });
 
     ovl.dl_save_media_ms = (msg, filename = '', attachExt = true, dir = './downloads') =>
       dl_save_media_ms(ovl, msg, filename, attachExt, dir);
